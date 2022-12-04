@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 2560
     height: 1357
   m_ShowMode: 4
-  m_Title: Game
+  m_Title: Hierarchy
   m_RootView: {fileID: 6}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 98
+  controlID: 87
 --- !u!114 &3
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -68,8 +68,8 @@ MonoBehaviour:
     y: 0
     width: 605
     height: 1307
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 71}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
@@ -346,22 +346,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts
+    - Assets/Prefabs/Cars
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/Prefabs/Cars
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\Game Dev\Multiplayer-Racer\Multiplayer-Racer-Unity
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: e0750000
-    m_LastClickedID: 30176
-    m_ExpandedIDs: 00000000986c000000ca9a3bffffff7f
+    m_SelectedIDs: 827a0000
+    m_LastClickedID: 31362
+    m_ExpandedIDs: 00000000be7200001273000006840000ac90000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -389,7 +389,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000986c0000
+    m_ExpandedIDs: 00000000be720000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -416,7 +416,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c623000026c900003cc90000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -517,9 +517,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: e8f9ffff
-      m_LastClickedID: -1560
-      m_ExpandedIDs: 2afbffff6c6a0000a26a0000d26a0000
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: 1448ffffb848fffff04affff1a4bffffe25affff865bffffbe5dffffe85dffff98baffffa4c1fffff0c1ffff2cc4ffff5ac4ffff4cc5ffff74ceffff2afbfffff4ffffff8c700000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -834,9 +834,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 699.2223, y: 336.46973, z: -1.9287109}
+    m_Target: {x: 742.298, y: 338.05893, z: -2.5367866}
     speed: 2
-    m_Value: {x: 699.2223, y: 336.46973, z: -1.9287109}
+    m_Value: {x: 742.298, y: 338.05893, z: -2.5367866}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -886,9 +886,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 430.75305
+    m_Target: 491.5608
     speed: 2
-    m_Value: 430.75305
+    m_Value: 491.5608
   m_Ortho:
     m_Target: 1
     speed: 2

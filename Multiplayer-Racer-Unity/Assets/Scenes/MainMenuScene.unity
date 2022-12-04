@@ -1201,7 +1201,7 @@ MonoBehaviour:
   m_MaxConnectAttempts: 60
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
-    Address: 127.0.0.1
+    Address: 
     Port: 7777
     ServerListenAddress: 
   DebugSimulator:
@@ -1225,8 +1225,13 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1673050565}
-    PlayerPrefab: {fileID: 0}
-    NetworkPrefabs: []
+    PlayerPrefab: {fileID: 2760778979641847470, guid: 1ade452ac85f63e4e93aa301e2d6c3c3, type: 3}
+    NetworkPrefabs:
+    - Override: 0
+      Prefab: {fileID: 2760778979641847470, guid: 1ade452ac85f63e4e93aa301e2d6c3c3, type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
@@ -1478,6 +1483,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1950532663}
   - component: {fileID: 1950532662}
+  - component: {fileID: 1950532664}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -1562,6 +1568,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1950532664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1950532661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 1
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
 --- !u!1 &2030332491
 GameObject:
   m_ObjectHideFlags: 0
