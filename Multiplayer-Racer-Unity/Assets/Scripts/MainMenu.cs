@@ -24,7 +24,7 @@ public class MainMenu : MonoBehaviour
 
             NetworkManager.Singleton.StartHost();
             Debug.Log("Hosting Server on: " + transport.ConnectionData.ServerEndPoint);
-            NetworkManager.Singleton.SceneManager.LoadScene("SampleScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("Level 1", UnityEngine.SceneManagement.LoadSceneMode.Single);
         });
 
         clientBtn.onClick.AddListener(() => {
