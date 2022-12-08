@@ -5,16 +5,19 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MainMenuScene.unity
     guid: 438d14f380f35ed45b37f1952a2c5353
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
+  - enabled: 0
     path: Assets/Simple Roads/Sample Scenes/City Junction.unity
     guid: 0b3e95f4a70707c40a55ce03c7b94dfa
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level 1.unity
     guid: 73169fee4bf15444e94dc5a86213247f
+  - enabled: 1
+    path: Assets/Scenes/Jaren/TestMultiplayerSceneJaren.unity
+    guid: 162df2d306bc6c8489a768950cac529c
   m_configObjects: {}
