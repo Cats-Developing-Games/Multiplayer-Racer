@@ -1221,14 +1221,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RunInBackground: 1
-  LogLevel: 0
+  LogLevel: 1
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1673050565}
-    PlayerPrefab: {fileID: 2760778979641847470, guid: 1ade452ac85f63e4e93aa301e2d6c3c3, type: 3}
+    PlayerPrefab: {fileID: 6756066438253991011, guid: aaeec3cf024ffe1419d98f692d657c64, type: 3}
     NetworkPrefabs:
     - Override: 0
-      Prefab: {fileID: 2760778979641847470, guid: 1ade452ac85f63e4e93aa301e2d6c3c3, type: 3}
+      Prefab: {fileID: 6756066438253991011, guid: aaeec3cf024ffe1419d98f692d657c64, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}

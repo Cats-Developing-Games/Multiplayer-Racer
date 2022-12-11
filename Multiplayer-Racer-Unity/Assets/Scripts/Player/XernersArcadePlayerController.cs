@@ -168,4 +168,8 @@ public class XernersArcadePlayerController : NetworkBehaviour
     //    Debug.Log("Moving client " + OwnerClientId.ToString() + " to position " + pos.ToString());
     //    NetworkManager.ConnectedClients[clientId].PlayerObject.transform.position = pos;
     //}
+
+    public void OnCollisionEnter(Collision collision) {
+        Debug.Log(collision);
+    }
 }

@@ -17,15 +17,33 @@ public class WorldSpaceFloatingName : NetworkBehaviour
     // Update is called once per frame
     void Start()
     {
-        camera = GameObject.FindGameObjectWithTag("MainCamera");
+        EnsureHasCamera();
         TMPro.TextMeshPro text = GetComponent<TMPro.TextMeshPro>();
         if (name == "") name = "Player";
         text.alignment = TMPro.TextAlignmentOptions.Center;
         text.text = name;
     }
 
-    void Update() {
-        transform.LookAt(camera.transform);
-        transform.position = new Vector3(follow.position.x, follow.position.y + 1f, follow.position.z);
+    void Update()
+    {
+        if(EnsureHasCamera()) {
+            transform.LookAt(camera.transform);
+            transform.position = new Vector3(follow.position.x, follow.position.y + 1f, follow.position.z);
+        }
+       
     }
+
+    private bool EnsureHasCamera()
+    {
+        // Already has valid camera target
+        if(HasCamera()) return true;
+
+        // Get main camera
+        camera = GameObject.FindGameObjectWithTag("MainCamera");
+
+        Debug.Log("Reacquired camera target in scene: " + camera?.scene.name ?? "[NOT FOUND]");
+        return HasCamera();
+    }
+
+    private bool HasCamera() => camera != null;
 }
