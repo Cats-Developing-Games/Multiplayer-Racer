@@ -1,5 +1,19 @@
 {
   "dependencies": {
+    "com.baracuda.runtime-monitoring": {
+      "version": "file:com.baracuda.runtime-monitoring",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.baracuda.thread-dispatcher": "5.0.0"
+      }
+    },
+    "com.baracuda.thread-dispatcher": {
+      "version": "file:com.baracuda.thread-dispatcher",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.2d.animation": {
       "version": "8.0.5",
       "depth": 1,

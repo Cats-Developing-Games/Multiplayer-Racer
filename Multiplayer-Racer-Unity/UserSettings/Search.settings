@@ -7,7 +7,7 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.BDE7F5D3" = "t:transform player"
+	"last_search.BDE7F5D3" = "t:material fs000"
 	"OpenInspectorPreview.BDE7F5D3" = "0"
 	"currentGroup.BDE7F5D3" = "all"
 }
