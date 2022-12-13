@@ -7,25 +7,24 @@ using Unity.Netcode.Components;
 [RequireComponent(typeof(NetworkTransform))]
 public class XernersArcadePlayerController : NetworkBehaviour
 {
+    [Header("Vehicle")]
+    [Vehicle]
+    [SerializeField] VehicleSO SO;
+
+    float forwardVelocity = 0f;
+    float currentAcceleration = 0f;
+    float currentTurnRadius = 0f;
+
     new CinemachineVirtualCamera camera;
     [Header("Camera")]
     [SerializeField] bool follow = false;
     [SerializeField] bool lookAt = false;
 
-    [Header("Movement")]
-    [SerializeField] float maxVelocity = 10f;
-    [SerializeField] float acceleration = 10f;
-    [SerializeField] float breakDeceleration = 10f;
-    [SerializeField] float minTurnRadius = 1f;
-    float forwardVelocity = 0f;
-    float currentAcceleration = 0f;
-    float currentTurnRadius = 0f;
-
     [Header("Gizmos")]
     [SerializeField] bool drawGizmos = false;
     [SerializeField] bool drawMininumTurnRadius = false;
 
-    // Gizmo variables
+    // Variables used in Gizmos
     Vector3 newPosition;
     Vector3 movementCircleCenter;
 
@@ -64,8 +63,8 @@ public class XernersArcadePlayerController : NetworkBehaviour
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireSphere(movementCircleCenter, Math.Abs(currentTurnRadius));
                 if (drawMininumTurnRadius) {
-                    Vector3 minCircleCenter = transform.position + (transform.right * (currentTurnRadius < 0 ? -1 : 1) * minTurnRadius);
-                    Gizmos.DrawWireSphere(minCircleCenter, minTurnRadius);
+                    Vector3 minCircleCenter = transform.position + (transform.right * (currentTurnRadius < 0 ? -1 : 1) * SO.MinTurnRadius);
+                    Gizmos.DrawWireSphere(minCircleCenter, SO.MinTurnRadius);
                 }
                 return;
             }
@@ -91,10 +90,8 @@ public class XernersArcadePlayerController : NetworkBehaviour
 
         newPosition = isTurning() ? getCircleMovement() : getStraightMovement();
         //Debug.Log("Moving client " + OwnerClientId.ToString() + " to position " + newPosition.ToString() + ". Turn radius is " + currentTurnRadius.ToString());
-        //if (Input.GetKeyDown(KeyCode.W)) {
         UpdateRotation();
         transform.position = newPosition;
-        //}
         void UpdateRotation() {
             // I may be wrong here, but I don't think the car should update its x or z rotation in its own control method (unless its a plane-car)
             // If the cars yaw is changing, it should be from outside sources
@@ -104,15 +101,6 @@ public class XernersArcadePlayerController : NetworkBehaviour
             Vector3 rotateBy = new Vector3(transform.rotation.x, yAxisRotation, transform.rotation.z);
             rotateBy = rotateBy * (isTurningRight() ? 1 : -1);
             transform.Rotate(rotateBy);
-            //Vector3 normalizedDisplacement = (newPosition - transform.position).normalized;
-            //if (isMovingBackwards(normalizedDisplacement)) {
-            //    normalizedDisplacement = -normalizedDisplacement;
-            //}
-            //transform.LookAt(transform.position + normalizedDisplacement, Vector3.up);
-
-            //bool isMovingBackwards(Vector3 normalizedDisplacement) {
-            //    return Vector3.Dot(normalizedDisplacement, transform.forward) < 0f;
-            //}
         }
     }
 
@@ -140,7 +128,7 @@ public class XernersArcadePlayerController : NetworkBehaviour
     }
 
     protected virtual float CalculateTurnRadius() {
-        return (minTurnRadius / horizontalInput) * (forwardVelocity / maxVelocity) * 5f;
+        return (SO.MinTurnRadius / horizontalInput) * (forwardVelocity / SO.MaxVelocity) * 5f;
     }
 
     void UpdateWheels() {
@@ -152,15 +140,15 @@ public class XernersArcadePlayerController : NetworkBehaviour
     }
 
     void HandleMotor() {
-        currentAcceleration = verticalInput * acceleration;
-        forwardVelocity = Math.Clamp(forwardVelocity + (currentAcceleration * Time.deltaTime), -maxVelocity, maxVelocity);
+        currentAcceleration = verticalInput * SO.Acceleration;
+        forwardVelocity = Math.Clamp(forwardVelocity + (currentAcceleration * Time.deltaTime), -SO.MaxVelocity, SO.MaxVelocity);
         if (isBreaking) {
             ApplyBreaking();
         }
     }
 
     public virtual void ApplyBreaking() {
-        forwardVelocity -= verticalInput * breakDeceleration * Time.deltaTime;
+        forwardVelocity -= verticalInput * SO.BreakDeceleration * Time.deltaTime;
     }
 
     //[ServerRpc(RequireOwnership = false)]

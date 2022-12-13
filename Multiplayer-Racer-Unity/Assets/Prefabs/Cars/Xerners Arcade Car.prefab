@@ -490,12 +490,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14ee3af152dc9d64d9f194d0e4b06019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SO: {fileID: 11400000, guid: 9a1daef4f913477448fc122d3f11e491, type: 2}
   follow: 0
   lookAt: 0
-  maxVelocity: 10
-  acceleration: 10
-  breakDeceleration: 10
-  minTurnRadius: 1
   drawGizmos: 1
   drawMininumTurnRadius: 0
 --- !u!1 &5341459108760052818
