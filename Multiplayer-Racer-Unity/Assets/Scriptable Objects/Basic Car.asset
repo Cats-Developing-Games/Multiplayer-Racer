@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0159d568f4d83ea419a56575449b1cf5, type: 3}
   m_Name: Basic Car
   m_EditorClassIdentifier: 
-  MaxVelocity: 10
+  Mass: 1360
+  EngineForce: 5000
+  MaxVelocity: 20
   Acceleration: 10
-  BreakDeceleration: 10
   MinTurnRadius: 1
+  SteeringModifier: 1
+  WheelTraction: 1

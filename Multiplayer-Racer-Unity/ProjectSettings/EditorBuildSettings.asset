@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level 1.unity
     guid: 73169fee4bf15444e94dc5a86213247f
+  - enabled: 1
+    path: Assets/Scenes/Xerrner/City Junction.unity
+    guid: eb81becdbeab46d40af19aafb616a810
   m_configObjects: {}

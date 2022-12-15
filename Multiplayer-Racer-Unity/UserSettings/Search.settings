@@ -7,9 +7,12 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.BDE7F5D3" = "t:vehicleso "
+	"last_search.BDE7F5D3" = "defa"
 	"OpenInspectorPreview.BDE7F5D3" = "0"
 	"currentGroup.BDE7F5D3" = "all"
+	"last_search.982FBD6D" = "t:monoscript "
+	"OpenInspectorPreview.982FBD6D" = "0"
+	"currentGroup.982FBD6D" = "all"
 }
 providers = {
 	adb = {
@@ -56,6 +59,7 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"d"
 ]
 searchItemFavorites = [
 ]
