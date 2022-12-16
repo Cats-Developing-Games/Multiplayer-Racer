@@ -307,4 +307,8 @@ public class XernersArcadePlayerController : NetworkBehaviour
     }
 
     #endregion
+
+    public void HandleTerrainChange(TerrainSO newTerrain) {
+        Debug.Log(newTerrain);
+    }
 }

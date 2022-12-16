@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class TerrainConsumer : MonoBehaviour
 {
+    public UnityEvent<TerrainSO> OnActiveTerrainChange;
+
     private readonly HashSet<TerrainProvider> _terrainProviders = new HashSet<TerrainProvider>();
     private TerrainProvider _activeTerrain = null;
-
-    public TerrainType GetTerrainType() => _activeTerrain?.Type ?? TerrainType.Road;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -34,16 +35,20 @@ public class TerrainConsumer : MonoBehaviour
     {
         int bestPriority = int.MinValue;
         _activeTerrain = null;
+        TerrainProvider bestTerrain = null;
         foreach (TerrainProvider provider in _terrainProviders)
         {
-            var priority = provider.Type.GetPriority();
+            var priority = provider.Terrain.Priority;
             if (priority > bestPriority)
             {
-                _activeTerrain = provider;
+                bestTerrain = provider;
                 bestPriority = priority;
             }
         }
 
-        Debug.Log("Active Terrain: " + _activeTerrain?.Type ?? "NONE");
+        if(bestTerrain is not null && bestTerrain != _activeTerrain) 
+            OnActiveTerrainChange.Invoke(bestTerrain.Terrain);
+
+        _activeTerrain = bestTerrain;
     }
 }
