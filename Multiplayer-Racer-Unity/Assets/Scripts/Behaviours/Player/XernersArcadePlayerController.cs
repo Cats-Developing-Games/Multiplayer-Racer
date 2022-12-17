@@ -51,6 +51,7 @@ public class XernersArcadePlayerController : NetworkBehaviour
 
     void Update() {
         if (!IsOwner) return;
+        //if (movement is null) return;
         transform.position = movement.GetMove(Time.deltaTime, RoadFrictionCoefficient);
         UpdateWheels();
     }

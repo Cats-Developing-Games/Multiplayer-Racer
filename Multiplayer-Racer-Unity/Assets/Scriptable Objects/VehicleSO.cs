@@ -8,10 +8,10 @@ public class VehicleSO : ScriptableObject
     public float Mass = VehicleDefaults.Mass;
 
     [Header("Engine")]
-    public float EngineForce = VehicleDefaults.EngineForce;
+    public Vector3 EngineForce = new Vector3(0f, 0f, VehicleDefaults.EngineForce);
     public float MaxSpeed = VehicleDefaults.MaxSpeed;
 
-    public float GetAcceleration() => KineticPhysics.Acceleration(EngineForce, Mass);
+    public Vector3 GetAcceleration() => KineticPhysics.Acceleration(EngineForce, Mass);
 
     [Header("Steering")]
     public float MinTurnRadius = VehicleDefaults.MinTurnRadius;

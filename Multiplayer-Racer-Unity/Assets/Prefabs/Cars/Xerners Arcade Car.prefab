@@ -431,6 +431,7 @@ GameObject:
   - component: {fileID: 5557567088327314675}
   - component: {fileID: 6253735307745677700}
   - component: {fileID: 6231593071155902253}
+  - component: {fileID: 2168069704644973157}
   m_Layer: 0
   m_Name: Car Visuals
   m_TagString: Untagged
@@ -506,12 +507,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14ee3af152dc9d64d9f194d0e4b06019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SO: {fileID: 11400000, guid: 9a1daef4f913477448fc122d3f11e491, type: 2}
-  roadFrictionCoefficient: 0.7
+  vehicleSO: {fileID: 11400000, guid: 9a1daef4f913477448fc122d3f11e491, type: 2}
   follow: 0
   lookAt: 0
   drawGizmos: 0
   drawMininumTurnRadius: 0
+  RoadFrictionCoefficient: 0.7
 --- !u!114 &6231593071155902253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,6 +555,18 @@ MonoBehaviour:
   m_DefaultActionMap: Driving
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &2168069704644973157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3917510526018101321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ee401bf990bc6a43b01309d180a2397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5341459108760052818
 GameObject:
   m_ObjectHideFlags: 0

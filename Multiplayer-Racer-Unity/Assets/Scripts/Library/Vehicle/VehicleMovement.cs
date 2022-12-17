@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class VehicleMovement {
     Vector3 acceleration = new Vector3();
-    public Vector3 AccelerationModifier = new Vector3();
+    public Vector3 AccelerationModifier = new Vector3(1f, 1f, 1f);
     Vector3 velocity = new Vector3();
     float maxDrivingSpeed = 0f;
-    public float MaxSpeedModifier = 0f;
+    public float MaxSpeedModifier = 1f;
     float steeringValue = 0f;
     float turnRadius = 0f;
     VehicleSO vehicleSO;
@@ -120,22 +120,22 @@ public class VehicleMovement {
 
     Vector3 CalcEngineForce(float coefficientOfFriction) => CalcEngineForce(input, vehicleSO.EngineForce, vehicleSO.WheelTraction, coefficientOfFriction);
 
-    Vector3 CalcEngineForce(VehicleInputHandler input, float engineForce, float wheelTraction, float coefficientOfFriction) {
+    Vector3 CalcEngineForce(VehicleInputHandler input, Vector3 engineForce, float wheelTraction, float coefficientOfFriction) {
         if (input.IsBreaking) {
             return Vector3.zero;
         }
-        return new Vector3(0f, 0f, engineForce) * input.VerticalInput * coefficientOfFriction * wheelTraction;
+        return engineForce * input.VerticalInput * coefficientOfFriction * wheelTraction;
     }
 
     Vector3 CalcNetForce(float coefficientOfFriction) => CalcNetForce(input, vehicleSO.EngineForce, vehicleSO.WheelTraction, coefficientOfFriction);
 
-    Vector3 CalcNetForce(VehicleInputHandler input, float engineForce, float wheelTraction, float coefficientOfFriction) {
+    Vector3 CalcNetForce(VehicleInputHandler input, Vector3 engineForce, float wheelTraction, float coefficientOfFriction) {
         return CalcEngineForce(input, engineForce, wheelTraction, coefficientOfFriction) - CalcFrictionForce(input, coefficientOfFriction);
     }
 
     Vector3 CalcAcceleration(float coefficientOfFriction) => CalcAcceleration(input, vehicleSO.EngineForce, vehicleSO.WheelTraction, coefficientOfFriction, vehicleSO.Mass);
 
-    Vector3 CalcAcceleration(VehicleInputHandler input, float engineForce, float wheelTraction, float coefficientOfFriction, float mass) {
+    Vector3 CalcAcceleration(VehicleInputHandler input, Vector3 engineForce, float wheelTraction, float coefficientOfFriction, float mass) {
         return KineticPhysics.Acceleration(CalcNetForce(input, engineForce, wheelTraction, coefficientOfFriction), mass);
     }
 

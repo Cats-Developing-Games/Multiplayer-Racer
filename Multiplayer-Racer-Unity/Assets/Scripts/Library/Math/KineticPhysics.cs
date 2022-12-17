@@ -46,7 +46,7 @@ public static class KineticPhysics {
     #region Acceleration
 
     /// <summary>Calculate acceleration using Newtons formula A=f/m</summary>
-    public static float Acceleration(float force, float mass) => force / mass;
+    public static Vector3 Acceleration(Vector3 force, float mass) => force / mass;
 
     #endregion
 
@@ -113,10 +113,6 @@ public static class KineticPhysics {
 
     /// <summary>Calculate force based on Newtons formula F=ma</summary>
     public static Vector3 Force(float mass, Vector3 acceleration) => mass * acceleration;
-
-    internal static Vector3 Acceleration(Vector3 vector3, float mass) {
-        throw new NotImplementedException();
-    }
 
     #endregion
 }
