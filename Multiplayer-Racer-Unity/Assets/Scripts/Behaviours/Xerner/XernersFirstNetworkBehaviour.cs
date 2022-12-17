@@ -23,7 +23,7 @@ public class XernersFirstNetworkBehaviour : NetworkBehaviour
     }
 
     void Update() {
-        if (!IsOwner) return;
+       if (!IsOwner) return;
         
         Vector3 moveDir = new Vector3(0, 0, 0);
 

@@ -8,12 +8,12 @@ public class PlayerController : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!IsOwner) return;
+        //if(!IsOwner) return;
 
         var moveDir = Vector3.zero;
 
-        if(Input.GetKey(KeyCode.UpArrow)) moveDir.y += 1f;
-        if(Input.GetKey(KeyCode.DownArrow)) moveDir.y -= 1f;
+        if(Input.GetKey(KeyCode.UpArrow)) moveDir.z += 1f;
+        if(Input.GetKey(KeyCode.DownArrow)) moveDir.z -= 1f;
         if(Input.GetKey(KeyCode.LeftArrow)) moveDir.x -= 1f;
         if(Input.GetKey(KeyCode.RightArrow)) moveDir.x += 1f;
 
