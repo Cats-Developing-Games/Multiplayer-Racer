@@ -15,12 +15,12 @@ public class NetworkUIManager : MonoBehaviour
         //favor server as Source of Truth.
         serverBtn.onClick.AddListener(() =>
        {
-           NetworkManager.Singleton.StartHost();
+           NetworkManager.Singleton.StartServer();
        });
 
         hostBtn.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.StartServer();
+            NetworkManager.Singleton.StartHost();
         });
 
         clientBtn.onClick.AddListener(() =>

@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 1450969260404464142}
   - component: {fileID: 7272428522409852947}
   m_Layer: 0
-  m_Name: Car
+  m_Name: Jarens Car
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -118,7 +118,7 @@ Transform:
   - {fileID: 675788206065935304}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &-7965820989472645891
 MonoBehaviour:
   m_ObjectHideFlags: 0

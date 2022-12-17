@@ -9,10 +9,10 @@ public class CheckpointController : NetworkBehaviour
     [SerializeField] GameObject[] checkpoints;
     GameObject startEndCheckpoint;
     GameObject lastCheckpoint;
-    public int laps;
-    public int currLap;
-    public bool started;
-    public bool ended;
+    public int laps = 1;
+    public int currLap = 1;
+    public bool started = false;
+    public bool ended = false;
     private HashSet<GameObject> CheckpointSet = new HashSet<GameObject>();
 
     const string START_END_TAG = "Checkpoint/Start-End";
@@ -20,14 +20,6 @@ public class CheckpointController : NetworkBehaviour
     const string LAST_CHECKPOINT_TAG = "Checkpoint/Last";
 
     HashSet<string> checkpointTags = new HashSet<string>() { START_END_TAG, CHECKPOINT_TAG, LAST_CHECKPOINT_TAG };
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        laps = 1;
-        currLap = 1;
-        ended = false;
-    }
 
     public override void OnNetworkSpawn() {
         startEndCheckpoint = GameObject.FindGameObjectWithTag(START_END_TAG);
@@ -40,7 +32,6 @@ public class CheckpointController : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name);
         if (checkpointTags.Contains(other.tag))
         {
             UpdateCheckPointSet(other);
