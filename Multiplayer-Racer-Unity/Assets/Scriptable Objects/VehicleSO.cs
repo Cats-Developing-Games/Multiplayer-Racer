@@ -9,7 +9,7 @@ public class VehicleSO : ScriptableObject
 
     [Header("Engine")]
     public float EngineForce = VehicleDefaults.EngineForce;
-    public float MaxVelocity = VehicleDefaults.MaxVelocity;
+    public float MaxSpeed = VehicleDefaults.MaxSpeed;
 
     public float GetAcceleration() => KineticPhysics.Acceleration(EngineForce, Mass);
 
@@ -29,7 +29,7 @@ public class VehicleSO : ScriptableObject
 }
 
 struct VehicleDefaults {
-    public const float RollingDeceleration = -1f;
+    public static readonly Vector3 RollingDeceleration = new Vector3(0f, 0f, -1f);
     // Unity's old input systems GetAxis increased/decreased 0.05 per step. Assuming it was ran in FixedUpdate (50/sec), thats 0->1 in 2.5 seconds
     public const float KeyboardTimeToMaxTurn = 2.5f;
 
@@ -39,7 +39,7 @@ struct VehicleDefaults {
 
     // Engine
     public const float EngineForce = 10f;
-    public const float MaxVelocity = 10f;
+    public const float MaxSpeed = 10f;
     public const float Acceleration = 10f;
 
     // Steering
