@@ -1,5 +1,19 @@
 {
   "dependencies": {
+    "com.baracuda.runtime-monitoring": {
+      "version": "file:com.baracuda.runtime-monitoring",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.baracuda.thread-dispatcher": "5.0.0"
+      }
+    },
+    "com.baracuda.thread-dispatcher": {
+      "version": "file:com.baracuda.thread-dispatcher",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.2d.animation": {
       "version": "8.0.5",
       "depth": 1,
@@ -159,6 +173,15 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.inputsystem": {
+      "version": "1.4.4",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.uielements": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.mathematics": {
