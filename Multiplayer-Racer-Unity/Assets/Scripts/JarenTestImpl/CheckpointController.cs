@@ -1,20 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
-public class CheckpointController : MonoBehaviour
+public class CheckpointController : NetworkBehaviour
 {
-    [SerializeField]  
-    public GameObject startEndCheckpoint;
-    [SerializeField]  
-    public GameObject[] checkpoints;
-    [SerializeField]
-    public GameObject lastCheckpoint;
+    [SerializeField] GameObject[] checkpoints;
+    GameObject startEndCheckpoint;
+    GameObject lastCheckpoint;
     public int laps;
     public int currLap;
     public bool started;
     public bool ended;
     private HashSet<GameObject> CheckpointSet = new HashSet<GameObject>();
+
+    const string START_END_TAG = "Checkpoint/Start-End";
+    const string CHECKPOINT_TAG = "Checkpoint/Checkpoint";
+    const string LAST_CHECKPOINT_TAG = "Checkpoint/Last";
+
+    HashSet<string> checkpointTags = new HashSet<string>() { START_END_TAG, CHECKPOINT_TAG, LAST_CHECKPOINT_TAG };
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,17 +29,24 @@ public class CheckpointController : MonoBehaviour
         ended = false;
     }
 
-   
+    public override void OnNetworkSpawn() {
+        startEndCheckpoint = GameObject.FindGameObjectWithTag(START_END_TAG);
+        List<GameObject> checkpoints = GameObject.FindGameObjectsWithTag(CHECKPOINT_TAG).ToList();
+        lastCheckpoint = GameObject.FindGameObjectWithTag(LAST_CHECKPOINT_TAG);
+        checkpoints.Insert(0, startEndCheckpoint);
+        checkpoints.Add(lastCheckpoint);
+        this.checkpoints = checkpoints.ToArray();
+    }
 
     private void OnTriggerEnter(Collider other)
     {
-        
-
-        if (other.CompareTag("checkpoint"))
+        Debug.Log(other.name);
+        if (checkpointTags.Contains(other.tag))
         {
             UpdateCheckPointSet(other);
         }
     }
+
     /// <summary>
     ///  The UpdateCheckpointSet method verifies that each step of the race is valid by using a Set to track checkpoint inclusion,
     ///  as well as incrementing the lap and ending the race
