@@ -3,6 +3,12 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Vehicle", menuName = "Vehicles/Vehicle", order = 1)]
 public class VehicleSO : ScriptableObject
 {
+    [Header("Vehicle Selection")]
+    public string Name = "";
+    public GameObject InGamePrefab;
+    public GameObject PreviewPrefab;
+    
+
     [Header("General")]
     /// <summary>Kilograms</summary>
     public float Mass = VehicleDefaults.Mass;

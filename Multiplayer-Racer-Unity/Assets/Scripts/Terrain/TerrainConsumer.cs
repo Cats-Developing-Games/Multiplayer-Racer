@@ -7,14 +7,14 @@ public class TerrainConsumer : MonoBehaviour
 {
     public UnityEvent<TerrainSO> OnActiveTerrainChange;
 
-    private readonly HashSet<TerrainProvider> _terrainProviders = new HashSet<TerrainProvider>();
-    private TerrainProvider _activeTerrain = null;
+    private readonly HashSet<TerrainProvider> terrainProviders = new HashSet<TerrainProvider>();
+    private TerrainProvider activeTerrain = null;
 
     private void OnTriggerEnter(Collider other)
     {
         if(other.TryGetComponent<TerrainProvider>(out var terrainProvider))
         {
-            _terrainProviders.Add(terrainProvider);
+            terrainProviders.Add(terrainProvider);
             RecalculateActiveTerrain();
         }
     }
@@ -23,7 +23,7 @@ public class TerrainConsumer : MonoBehaviour
     {
         if (other.TryGetComponent<TerrainProvider>(out var terrainProvider))
         {
-            _terrainProviders.Remove(terrainProvider);
+            terrainProviders.Remove(terrainProvider);
             RecalculateActiveTerrain();
         }
     }
@@ -34,9 +34,9 @@ public class TerrainConsumer : MonoBehaviour
     private void RecalculateActiveTerrain()
     {
         int bestPriority = int.MinValue;
-        _activeTerrain = null;
+        activeTerrain = null;
         TerrainProvider bestTerrain = null;
-        foreach (TerrainProvider provider in _terrainProviders)
+        foreach (TerrainProvider provider in terrainProviders)
         {
             var priority = provider.Terrain.Priority;
             if (priority > bestPriority)
@@ -46,9 +46,9 @@ public class TerrainConsumer : MonoBehaviour
             }
         }
 
-        if(bestTerrain is not null && bestTerrain != _activeTerrain) 
+        if(bestTerrain is not null && bestTerrain != activeTerrain) 
             OnActiveTerrainChange.Invoke(bestTerrain.Terrain);
 
-        _activeTerrain = bestTerrain;
+        activeTerrain = bestTerrain;
     }
 }
