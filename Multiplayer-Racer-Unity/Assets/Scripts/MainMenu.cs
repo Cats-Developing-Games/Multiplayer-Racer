@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -16,6 +17,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Button clientBtn;
 
     private string publicIPAddress = null;
+    private bool useLoopback = true;
 
     void Awake()
     {
@@ -30,18 +32,24 @@ public class MainMenu : MonoBehaviour
 
             var localIP = GetLocalIPv4();
             var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-            transport.ConnectionData.Address = publicIPAddress;
-            transport.ConnectionData.ServerListenAddress = localIP;
+            transport.ConnectionData.Address = useLoopback ? "127.0.0.1" : publicIPAddress;
+            transport.ConnectionData.ServerListenAddress = useLoopback ? "127.0.0.1" : localIP;
 
             NetworkManager.Singleton.StartHost();
             Debug.Log("Hosting Server on: " + transport.ConnectionData.ServerEndPoint);
-            NetworkManager.Singleton.SceneManager.LoadScene("Level 1", UnityEngine.SceneManagement.LoadSceneMode.Single);
+            //NetworkManager.Singleton.SceneManager.LoadScene("Level 1", UnityEngine.SceneManagement.LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("VehicleSelectionScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
         });
 
         clientBtn.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = clientIPInputField.text;
+            NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = useLoopback ? "127.0.0.1" : clientIPInputField.text;
+
+            Debug.Log("Connecting to " + NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.ServerEndPoint);
             NetworkManager.Singleton.StartClient();
+
+            
+            Debug.Log("Connecting to " + clientIPInputField.text);
         });
     }
 
