@@ -59,7 +59,7 @@ public class VehicleSelectionSceneManager : NetworkBehaviour
  
     private PlayerVehiclePicker SpawnClientVehiclePicker(ulong clientId)
     {
-        GameObject spawnedPrefab = Instantiate(playerViewPrefab, new Vector3(clientId * 100, 0, 0), Quaternion.identity);
+        GameObject spawnedPrefab = Instantiate(playerViewPrefab, new Vector3((clientId + 1) * 100, 0, 0), Quaternion.identity);
         spawnedPrefab.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
         return spawnedPrefab.GetComponent<PlayerVehiclePicker>();
     }

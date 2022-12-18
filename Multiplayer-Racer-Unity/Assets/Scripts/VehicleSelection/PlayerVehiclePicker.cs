@@ -12,6 +12,8 @@ public class PlayerVehiclePicker : NetworkBehaviour
     [SerializeField] private Camera playerCamera;
     [SerializeField] private GameObject previewAnchor;
     [SerializeField] private List<VehicleSO> vehicles;
+    [SerializeField] private GameObject[] hideWhenNotOwner;
+
     private List<GameObject> vehiclePreviews;
     private NetworkVariable<int> selectedVehicleIndex = new NetworkVariable<int>(0);
 
@@ -19,6 +21,9 @@ public class PlayerVehiclePicker : NetworkBehaviour
     {
         selectedVehicleIndex.OnValueChanged += ChangeSelectedVehicle;
         InitializeVehiclePrefabs();
+
+        if (IsOwner) return;
+        foreach (var hideGameObject in hideWhenNotOwner) hideGameObject.SetActive(false);
     }
 
     private void ChangeSelectedVehicle(int previousIndex, int newIndex)
@@ -29,8 +34,6 @@ public class PlayerVehiclePicker : NetworkBehaviour
 
     public void Update()
     {
-
-
         if (!IsOwner) return;
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
@@ -66,6 +69,15 @@ public class PlayerVehiclePicker : NetworkBehaviour
 
     private void EnableVehiclePreview(int index) => vehiclePreviews[index].SetActive(true);
 
+    public void SelectNextVehicle()
+    {
+        if (IsOwner) SelectNextVehicleServerRpc();
+    }
+
+    public void SelectPreviousVehicle()
+    {
+        if (IsOwner) SelectPreviousVehicleServerRpc();
+    }
 
     [ServerRpc]
     private void SetSelectedVehicleIndexServerRpc(int index)
@@ -76,8 +88,8 @@ public class PlayerVehiclePicker : NetworkBehaviour
         selectedVehicleIndex.Value = clampedIndex;
     }
 
-    [ServerRpc] public void SelectNextVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value + 1);
-    [ServerRpc] public void SelectPreviousVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value - 1);
+    [ServerRpc] private void SelectNextVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value + 1);
+    [ServerRpc] private void SelectPreviousVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value - 1);
 
     #region Camera Viewbox
     public void SetCameraRect(Rect cameraRect, float time = 0f)
