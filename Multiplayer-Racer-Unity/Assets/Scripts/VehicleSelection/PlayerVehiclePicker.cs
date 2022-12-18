@@ -12,21 +12,28 @@ public class PlayerVehiclePicker : NetworkBehaviour
     [SerializeField] private GameObject previewAnchor;
     [SerializeField] private List<VehicleSO> vehicles;
     private List<GameObject> vehiclePreviews;
-    private int selectedVehicleIndex = 0;
+    private NetworkVariable<int> selectedVehicleIndex = new NetworkVariable<int>(0);
 
     public override void OnNetworkSpawn()
     {
-        if(!IsServer) return;
+        selectedVehicleIndex.OnValueChanged += ChangeSelectedVehicle;
         InitializeVehiclePrefabs();
     }
 
-    public void Update() {
-        if(!IsOwner) return;
+    private void ChangeSelectedVehicle(int previousIndex, int newIndex)
+    {
+        vehiclePreviews[previousIndex].SetActive(false);
+        EnableVehiclePreview(newIndex);
+    }
 
-        if(Input.GetKeyDown(KeyCode.RightArrow)) 
+    public void Update()
+    {
+        if (!IsOwner) return;
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
             SelectNextVehicleServerRpc();
-        else if(Input.GetKeyDown(KeyCode.LeftArrow))
-            SelectPreviousVehicleServerRpc();        
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            SelectPreviousVehicleServerRpc();
     }
 
 
@@ -41,28 +48,7 @@ public class PlayerVehiclePicker : NetworkBehaviour
             vehiclePreviews.Add(InitializeVehiclePrefab(vehicle));
         }
 
-        SelectVehicle(0);
-    }
-
-    private void SelectVehicle(int index)
-    {
-        var total = vehicles.Count;
-        var clampedIndex = (index + total) % total;
-
-        vehiclePreviews[selectedVehicleIndex].SetActive(false);
-        vehiclePreviews[clampedIndex].SetActive(true);
-        selectedVehicleIndex = clampedIndex;
-    }
-
-
-    [ServerRpc]
-    private void SelectNextVehicleServerRpc() {
-        SelectVehicle(selectedVehicleIndex + 1);
-    }
-
-    [ServerRpc]
-    private void SelectPreviousVehicleServerRpc() {
-        SelectVehicle(selectedVehicleIndex - 1);
+        EnableVehiclePreview(selectedVehicleIndex.Value);
     }
 
     private GameObject InitializeVehiclePrefab(VehicleSO vehicle)
@@ -70,27 +56,40 @@ public class PlayerVehiclePicker : NetworkBehaviour
         var prefab = vehicle.PreviewPrefab;
 
         var instance = Instantiate(prefab, previewAnchor.transform.position, Quaternion.identity, previewAnchor.transform);
-
-        var networkObj = instance.GetComponent<NetworkObject>();
-        if(!networkObj.TrySetParent(previewAnchor.transform, true))Debug.Log("Unable to set parent");
-        networkObj.SpawnWithOwnership(this.OwnerClientId);
-
         instance.SetActive(false);
 
         return instance;
     }
 
+    private void EnableVehiclePreview(int index) => vehiclePreviews[index].SetActive(true);
+
+
+    [ServerRpc]
+    private void SetSelectedVehicleIndexServerRpc(int index)
+    {
+        var total = vehicles.Count;
+        var clampedIndex = (index + total) % total;
+
+        selectedVehicleIndex.Value = clampedIndex;
+    }
+
+    [ServerRpc] public void SelectNextVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value + 1);
+    [ServerRpc] public void SelectPreviousVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value - 1);
+
+    #region Camera Viewbox
     public void SetCameraRect(Rect cameraRect, float time = 0f)
     {
         if (time != 0f) throw new NotImplementedException();
-        
+
         SetCameraRectClientRpc(cameraRect.x, cameraRect.y, cameraRect.width, cameraRect.height, time);
     }
 
     [ClientRpc]
-    private void SetCameraRectClientRpc(float x, float y, float width, float height, float time = 0f) {
+    private void SetCameraRectClientRpc(float x, float y, float width, float height, float time = 0f)
+    {
         var rect = new Rect(x, y, width, height);
 
         playerCamera.rect = rect;
     }
+    #endregion
 }

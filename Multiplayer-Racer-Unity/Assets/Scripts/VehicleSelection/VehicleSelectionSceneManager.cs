@@ -44,7 +44,9 @@ public class VehicleSelectionSceneManager : NetworkBehaviour
 
     private void RemoveClient(ulong clientId) {
         players.Remove(clientId);
-        RecalculateCameraRects(NetworkManager.Singleton.ConnectedClientsIds);
+
+        var reducedClientIds = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds.Where(id=>id!= clientId));
+        RecalculateCameraRects(reducedClientIds);
     }
 
     private void RecalculateCameraRects(IReadOnlyList<ulong> clientIds) {
