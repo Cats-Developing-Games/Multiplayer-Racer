@@ -15,14 +15,21 @@ public class VehicleMovement {
     VehicleInputHandler input;
     Transform transform;
 
-    public float TurnRadius { get; }
+    // Cheats
+    public bool NoRollingFriction = false;
+    public bool NoMaxSpeed = false;
+
+    public Vector3 Velocity { get; set; }
+
+    public float TurnRadius { get => turnRadius; }
 
     public VehicleMovement(VehicleSO vehicleSO, VehicleInputHandler input, Transform transform) {
         this.vehicleSO = vehicleSO;
+        turnRadius = vehicleSO.MinTurnRadius;
         this.input = input;
         this.transform = transform;
     }
-    
+
     public Vector3 GetMove(float deltaTime, float coefficientOfFriction) {
         // kinetics
         maxDrivingSpeed = vehicleSO.MaxSpeed * MaxSpeedModifier;
@@ -30,43 +37,31 @@ public class VehicleMovement {
         velocity = CalcVelocity(deltaTime);
 
         // steering
-        steeringValue = CalcSteeringValue(input, vehicleSO.SteeringModifier);
-        turnRadius = CalcTurnRadius(velocity, steeringValue, vehicleSO.MinTurnRadius, maxDrivingSpeed);
-
-        if (!input.IsBreaking && input.VerticalInput == 0 && velocity.magnitude != 0f)
-            applyRollingDeceleration();
+        steeringValue = CalcSteeringValue();
+        turnRadius = CalcTurnRadius();
 
         Vector3 newPosition;
-        if (IsTurning(turnRadius))
+        if (IsTurning())
             newPosition = GetCircleMovement(deltaTime);
         else
             newPosition = GetStraightMovement(deltaTime);
         return newPosition;
-
-        void applyRollingDeceleration() {
-            Vector3 rollingDecel = velocity.magnitude > 0f ? VehicleDefaults.RollingDeceleration : -VehicleDefaults.RollingDeceleration;
-            velocity = CalcVelocity(velocity, rollingDecel, deltaTime, maxDrivingSpeed);
-        }
     }
 
-    Vector3 GetStraightMovement(float deltaTime) => GetStraightMovement(transform, velocity, acceleration, deltaTime);
-
-    Vector3 GetStraightMovement(Transform transform, Vector3 velocity, Vector3 acceleration, float deltaTime) {
-        //return transform.position + transform.forward * KineticPhysics.Displacement(velocity, acceleration, deltaTime);
-        return transform.position + KineticPhysics.Displacement(velocity, acceleration, deltaTime);
+    Vector3 GetStraightMovement(float deltaTime) {
+        return transform.position + RotateToZAxis(KineticPhysics.Displacement(velocity, acceleration, deltaTime));
     }
 
-    public Vector3 CircleMovementCenter() => CircleMovementCenter(transform, turnRadius);
-
-    Vector3 CircleMovementCenter(Transform transform, float turnRadius) {
-        return transform.position + (transform.right * turnRadius);
+    Vector3 RotateToZAxis(Vector3 vector) {
+        float sign = Vector3.Angle(vector, Vector3.forward) > 90f ? -1f : 1f;
+        return Vector3.RotateTowards(vector, sign * transform.forward, 2 * Mathf.PI, 0f);
     }
 
-    Vector3 GetCircleMovement(float deltaTime) => GetCircleMovement(transform, velocity, turnRadius, deltaTime);
+    public Vector3 CircleMovementCenter() => transform.position + (transform.right * turnRadius);
 
-    Vector3 GetCircleMovement(Transform transform, Vector3 velocity, float turnRadius, float deltaTime) {
-        Vector3 movementCircleCenter = CircleMovementCenter(transform, turnRadius);
-        float angleToMoveBy = (velocity.magnitude / turnRadius) * deltaTime * Mathf.Rad2Deg;
+    Vector3 GetCircleMovement(float deltaTime) {
+        Vector3 movementCircleCenter = CircleMovementCenter();
+        float angleToMoveBy = (velocity.z / turnRadius) * deltaTime * Mathf.Rad2Deg;
         Vector3 newPositionOnCircle = Quaternion.AngleAxis(angleToMoveBy, Vector3.up) * -transform.right * turnRadius;
         Vector3 newPosition = newPositionOnCircle + movementCircleCenter;
         UpdateRotation();
@@ -79,24 +74,20 @@ public class VehicleMovement {
             Vector3 normalizedNewPosition = newPosition - movementCircleCenter;
             float yAxisRotation = Vector2.Angle(new Vector2(normalizedNewPosition.x, normalizedNewPosition.z), new Vector2(normalizedPosition.x, normalizedPosition.z));
             Vector3 rotateBy = new Vector3(transform.rotation.x, yAxisRotation, transform.rotation.z);
-            rotateBy = rotateBy * (IsTurningRight(turnRadius) ? 1 : -1);
+            rotateBy = rotateBy * (IsTurningRight() ? 1 : -1);
             transform.Rotate(rotateBy);
         }
     }
 
     public bool IsTurning() => turnRadius != 0;
 
-    public bool IsTurning(float turnRadius) => turnRadius != 0;
-
     bool IsTurningRight() => turnRadius > 0;
 
-    bool IsTurningRight(float turnRadius) => turnRadius > 0;
+    bool IsMovingForwards() => velocity.z > 0f;
+
+    bool IsMovingBackwards() => velocity.z < 0f;
 
     Vector3 CalcFrictionForce(float coefficientOfFriction) {
-        return CalcFrictionForce(input, coefficientOfFriction);
-    }
-
-    Vector3 CalcFrictionForce(VehicleInputHandler input, float coefficientOfFriction) {
         if (input.IsBreaking) {
             return CalcBreakForce(coefficientOfFriction);
         }
@@ -109,56 +100,60 @@ public class VehicleMovement {
     }
 
     Vector3 CalcBreakForce(float coefficientOfFriction) {
-        return CalcBreakForce(transform, vehicleSO.Mass, velocity, vehicleSO.WheelTraction, coefficientOfFriction);
-    }
-
-    Vector3 CalcBreakForce(Transform transform, float mass, Vector3 velocity, float wheelTraction, float coefficientOfFriction) {
-        Vector3 force = KineticPhysics.ForceOfFriction(mass, transform, coefficientOfFriction * wheelTraction);
-        force = velocity.magnitude > 0 ? force : -force;
+        Vector3 force = KineticPhysics.ForceOfFriction(velocity, vehicleSO.Mass, transform, coefficientOfFriction * vehicleSO.WheelTraction);
+        //force = IsMovingForwards() ? force : -force;
+        Debug.Log(force);
         return force;
     }
 
-    Vector3 CalcEngineForce(float coefficientOfFriction) => CalcEngineForce(input, vehicleSO.EngineForce, vehicleSO.WheelTraction, coefficientOfFriction);
-
-    Vector3 CalcEngineForce(VehicleInputHandler input, Vector3 engineForce, float wheelTraction, float coefficientOfFriction) {
+    Vector3 CalcEngineForce(float coefficientOfFriction) {
         if (input.IsBreaking) {
             return Vector3.zero;
         }
-        return engineForce * input.VerticalInput * coefficientOfFriction * wheelTraction;
+        return vehicleSO.EngineForce * input.VerticalInput * coefficientOfFriction * vehicleSO.WheelTraction;
     }
 
-    Vector3 CalcNetForce(float coefficientOfFriction) => CalcNetForce(input, vehicleSO.EngineForce, vehicleSO.WheelTraction, coefficientOfFriction);
-
-    Vector3 CalcNetForce(VehicleInputHandler input, Vector3 engineForce, float wheelTraction, float coefficientOfFriction) {
-        return CalcEngineForce(input, engineForce, wheelTraction, coefficientOfFriction) - CalcFrictionForce(input, coefficientOfFriction);
+    Vector3 CalcNetForce(float coefficientOfFriction) {
+        return CalcEngineForce(coefficientOfFriction) + CalcFrictionForce(coefficientOfFriction);
     }
 
-    Vector3 CalcAcceleration(float coefficientOfFriction) => CalcAcceleration(input, vehicleSO.EngineForce, vehicleSO.WheelTraction, coefficientOfFriction, vehicleSO.Mass);
-
-    Vector3 CalcAcceleration(VehicleInputHandler input, Vector3 engineForce, float wheelTraction, float coefficientOfFriction, float mass) {
-        return KineticPhysics.Acceleration(CalcNetForce(input, engineForce, wheelTraction, coefficientOfFriction), mass);
-    }
-
-    Vector3 CalcVelocity(float deltaTime) => CalcVelocity(velocity, acceleration, deltaTime, maxDrivingSpeed);
-
-    Vector3 CalcVelocity(Vector3 originalVelocity, Vector3 acceleration, float deltaTime, float? maxSpeed = null) {
-        Vector3 velocity = KineticPhysics.Velocity(originalVelocity, acceleration, deltaTime);
-        if (maxSpeed is not null) {
-            return new Vector3(velocity.x, velocity.y, Mathf.Clamp(velocity.z, (float)-maxSpeed, (float)maxSpeed));
+    Vector3 CalcAcceleration(float coefficientOfFriction) {
+        if (!NoRollingFriction && (!input.IsBreaking && input.VerticalInput == 0f)) {
+            if (IsMovingForwards())
+                return VehicleDefaults.RollingDeceleration;
+            else if (IsMovingBackwards())
+                return -VehicleDefaults.RollingDeceleration;
+        } else {
+            Vector3 netForce = CalcNetForce(coefficientOfFriction);
+            return KineticPhysics.Acceleration(netForce, vehicleSO.Mass);
         }
-        return velocity;
+        return Vector3.zero;
+    }
+
+    Vector3 CalcVelocity(float deltaTime) {
+        velocity = KineticPhysics.Velocity(velocity, acceleration, deltaTime);
+        velocity = velocity.RoundIfBasicallyZero();
+        float maxSpeed = CalcMaxSpeed();
+        return new Vector3(velocity.x, velocity.y, Mathf.Clamp(velocity.z, (float)-maxSpeed, (float)maxSpeed));
     }
 
     /// <returns>A value from -1 to 1</returns>
-    float CalcSteeringValue(VehicleInputHandler input, float steeringModifier) {
+    float CalcSteeringValue() {
         float steering = input.SteeringMethod.Invoke(input.HorizontalInput);
-        return steering * steeringModifier;
+        return steering * vehicleSO.SteeringModifier;
     }
 
-    float CalcTurnRadius(Vector3 velocity, float steering, float minTurnRadius, float maxSpeed) {
-        if (velocity.magnitude == 0f || steering == 0)
+    float CalcMaxSpeed() => NoMaxSpeed ? float.MaxValue : vehicleSO.MaxSpeed * MaxSpeedModifier;
+
+    /// <returns>Returns a negative value if turning left, and a positive one if turning right</returns>
+    // FIXME: this function sucks. It does not feel good to turn the car using this calculation
+    float CalcTurnRadius() {
+        if (steeringValue == 0f)
             return 0f;
-        else
-            return (minTurnRadius / steering) * (velocity.magnitude / maxSpeed) * 5f;
+        float turnRadius = vehicleSO.MinTurnRadius;
+        turnRadius *= (Mathf.Sign(velocity.z)) * (1f + velocity.magnitude);
+        turnRadius /= (Mathf.Sign(steeringValue) * (1f + Math.Abs(steeringValue)));
+        return turnRadius;
+        //return Mathf.Clamp(steeringValue * velocity.magnitude, vehicleSO.MinTurnRadius, float.MaxValue);// * 5f;
     }
 }

@@ -13,9 +13,8 @@ MonoBehaviour:
   m_Name: Basic Car
   m_EditorClassIdentifier: 
   Mass: 1360
-  EngineForce: 5000
-  MaxVelocity: 20
-  Acceleration: 10
+  EngineForce: {x: 0, y: 0, z: 3000}
+  MaxSpeed: 10
   MinTurnRadius: 1
   SteeringModifier: 1
   WheelTraction: 1

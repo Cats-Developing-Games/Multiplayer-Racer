@@ -25,6 +25,10 @@ public class XernersArcadePlayerController : NetworkBehaviour
     [SerializeField] bool drawGizmos = false;
     [SerializeField] bool drawMininumTurnRadius = false;
 
+    [Header("Cheats")]
+    [SerializeField] bool NoRollingFriction;
+    [SerializeField] bool NoMaxSpeed;
+
     // Input
     VehicleInputHandler input;
     VehicleMovement movement;
@@ -47,6 +51,8 @@ public class XernersArcadePlayerController : NetworkBehaviour
         }
         input = GetComponent<VehicleInputHandler>();
         movement = new VehicleMovement(vehicleSO, input, transform);
+        movement.NoRollingFriction = NoRollingFriction;
+        movement.NoMaxSpeed = NoMaxSpeed;
     }
 
     void Update() {
@@ -57,8 +63,10 @@ public class XernersArcadePlayerController : NetworkBehaviour
     }
 
     void OnDrawGizmos() {
-        if (drawGizmos) {
+        if (drawGizmos && movement != null) {
             if (movement.IsTurning()) {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(transform.position, movement.CircleMovementCenter());
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireSphere(movement.CircleMovementCenter(), Math.Abs(movement.TurnRadius));
                 if (drawMininumTurnRadius) {
