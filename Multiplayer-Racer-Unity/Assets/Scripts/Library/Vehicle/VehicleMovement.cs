@@ -4,23 +4,33 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class VehicleMovement {
+    /// <summary>Relative to the vehicles rotation</summary>
     Vector3 acceleration = new Vector3();
+    /// <summary>Relative to the vehicles rotation</summary>
     public Vector3 AccelerationModifier = new Vector3(1f, 1f, 1f);
+    /// <summary>Relative to the vehicles rotation</summary>
     Vector3 velocity = new Vector3();
+    /// <summary>The maximum forward speed of the vehicle (velocity.z)</summary>
     float maxDrivingSpeed = 0f;
     public float MaxSpeedModifier = 1f;
+    /// <summary>A value ranging from -1 to 1. Negative is left, positive is right</summary>
     float steeringValue = 0f;
+    /// <summary>Negative is left, positive is right</summary>
     float turnRadius = 0f;
     VehicleSO vehicleSO;
     VehicleInputHandler input;
+    /// <summary>The vehicles transform</summary>
     Transform transform;
 
     // Cheats
+    /// <summary>Whether or not the vehicle experiences deceleration when no input is received</summary>
     public bool NoRollingFriction = false;
     public bool NoMaxSpeed = false;
 
+    /// <summary>Relative to the vehicles rotation</summary>
     public Vector3 Velocity { get; set; }
 
+    /// <summary>Negative is left, positive is right</summary>
     public float TurnRadius { get => turnRadius; }
 
     public VehicleMovement(VehicleSO vehicleSO, VehicleInputHandler input, Transform transform) {
@@ -61,8 +71,9 @@ public class VehicleMovement {
 
     Vector3 GetCircleMovement(float deltaTime) {
         Vector3 movementCircleCenter = CircleMovementCenter();
+        Debug.Log(velocity);
         float angleToMoveBy = (velocity.z / turnRadius) * deltaTime * Mathf.Rad2Deg;
-        Vector3 newPositionOnCircle = Quaternion.AngleAxis(angleToMoveBy, Vector3.up) * -transform.right * turnRadius;
+        Vector3 newPositionOnCircle = Quaternion.AngleAxis(angleToMoveBy, transform.up) * -transform.right * turnRadius;
         Vector3 newPosition = newPositionOnCircle + movementCircleCenter;
         UpdateRotation();
         return newPosition;
@@ -146,13 +157,13 @@ public class VehicleMovement {
     float CalcMaxSpeed() => NoMaxSpeed ? float.MaxValue : vehicleSO.MaxSpeed * MaxSpeedModifier;
 
     /// <returns>Returns a negative value if turning left, and a positive one if turning right</returns>
-    // FIXME: this function sucks. It does not feel good to turn the car using this calculation
+    // FIXME: this function sucks. I (kenny) don't think it feels good to turn the car using this calculation
     float CalcTurnRadius() {
         if (steeringValue == 0f)
             return 0f;
         float turnRadius = vehicleSO.MinTurnRadius;
         turnRadius *= (Mathf.Sign(velocity.z)) * (1f + velocity.magnitude);
-        turnRadius /= (Mathf.Sign(steeringValue) * (1f + Math.Abs(steeringValue)));
+        turnRadius /= (Mathf.Sign(steeringValue) * (Math.Abs(steeringValue)));
         return turnRadius;
         //return Mathf.Clamp(steeringValue * velocity.magnitude, vehicleSO.MinTurnRadius, float.MaxValue);// * 5f;
     }
