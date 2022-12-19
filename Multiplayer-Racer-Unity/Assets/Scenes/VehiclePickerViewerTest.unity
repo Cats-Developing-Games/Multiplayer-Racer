@@ -135,6 +135,46 @@ PrefabInstance:
       propertyPath: m_Name
       value: Vehicle Picker
       objectReference: {fileID: 0}
+    - target: {fileID: 1182421560493167200, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1182421560493167200, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1182421560493167200, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1182421560493167200, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2403271698888191209, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2403271698888191209, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2403271698888191209, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2403271698888191209, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 2403271698888191209, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2973041145218477264, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5202594811517314078, guid: c590b207894d68444aea6a1ea39fa0a6, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1779021060

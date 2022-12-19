@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System;
 using System.Linq;
 using System.Collections;
@@ -17,10 +18,13 @@ public class VehicleSelectionSceneManager : NetworkBehaviour
         if (!IsServer) return;
         var nm = NetworkManager.Singleton;
         SetUpCameraForClients(nm.ConnectedClientsIds);
+        GetOwnerPlayerPicker().ShowStartGameButton();
 
         nm.OnClientConnectedCallback += InitializeNewClient;
         nm.OnClientDisconnectCallback += RemoveClient;
     }
+
+    private PlayerVehiclePicker GetOwnerPlayerPicker() => players[NetworkManager.Singleton.LocalClientId];
 
     private void SetUpCameraForClients(IReadOnlyList<ulong> clientIds)
     {
@@ -35,33 +39,46 @@ public class VehicleSelectionSceneManager : NetworkBehaviour
         RecalculateCameraRects(clientIds);
     }
 
+    private void PlayerChangedReadyUp(bool _, bool readyUp) => DetermineStartGameState();
+    private void DetermineStartGameState()
+    {
+        bool allReady = players.All(kvp => kvp.Value.PlayerReady.Value);
+        GetOwnerPlayerPicker().SetStartGameInteractable(allReady);
+    }
+
     private void InitializeNewClient(ulong clientId)
     {
         var newPlayer = SpawnClientVehiclePicker(clientId);
         players.Add(clientId, newPlayer);
         RecalculateCameraRects(NetworkManager.Singleton.ConnectedClientsIds);
+        DetermineStartGameState();
     }
 
-    private void RemoveClient(ulong clientId) {
+    private void RemoveClient(ulong clientId)
+    {
         players.Remove(clientId);
 
-        var reducedClientIds = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds.Where(id=>id!= clientId));
+        var reducedClientIds = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds.Where(id => id != clientId));
         RecalculateCameraRects(reducedClientIds);
     }
 
-    private void RecalculateCameraRects(IReadOnlyList<ulong> clientIds) {
+    private void RecalculateCameraRects(IReadOnlyList<ulong> clientIds)
+    {
         var clientViewports = CreateViewportRectsForClients(clientIds);
 
-        foreach(var (clientId, player) in players) {
+        foreach (var (clientId, player) in players)
+        {
             player.SetCameraRect(clientViewports[clientId]);
         }
     }
- 
+
     private PlayerVehiclePicker SpawnClientVehiclePicker(ulong clientId)
     {
         GameObject spawnedPrefab = Instantiate(playerViewPrefab, new Vector3((clientId + 1) * 100, 0, 0), Quaternion.identity);
         spawnedPrefab.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
-        return spawnedPrefab.GetComponent<PlayerVehiclePicker>();
+        var player = spawnedPrefab.GetComponent<PlayerVehiclePicker>();
+        player.PlayerReady.OnValueChanged += PlayerChangedReadyUp;
+        return player;
     }
 
     private Dictionary<ulong, Rect> CreateViewportRectsForClients(IReadOnlyList<ulong> clientIds)

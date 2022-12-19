@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0159d568f4d83ea419a56575449b1cf5, type: 3}
   m_Name: Orange Van
   m_EditorClassIdentifier: 
-  Name: Orange Van
+  VehicleName: Orange Van
   InGamePrefab: {fileID: 6756066438253991011, guid: 2ff1c5f0df3ecf042a083253be67bac4, type: 3}
   PreviewPrefab: {fileID: 2793882487219069038, guid: 87aa73ab823e53c4cb50875df30d359b, type: 3}
-  Mass: 1360
-  EngineForce: {x: 0, y: 0, z: 10}
-  MaxSpeed: 10
+  Mass: 1800
+  EngineForce: {x: 0, y: 0, z: 15}
+  MaxSpeed: 15
   MinTurnRadius: 1
   SteeringModifier: 1
   WheelTraction: 1

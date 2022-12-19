@@ -4,20 +4,29 @@ using UnityEngine;
 public class VehicleSO : ScriptableObject
 {
     [Header("Vehicle Selection")]
-    public string Name = "";
+    public string VehicleName = "";
     public GameObject InGamePrefab;
     public GameObject PreviewPrefab;
     
 
     [Header("General")]
+    [DisplayStat(1, 300, 3000)]
     /// <summary>Kilograms</summary>
     public float Mass = VehicleDefaults.Mass;
 
     [Header("Engine")]
     public Vector3 EngineForce = new Vector3(0f, 0f, VehicleDefaults.EngineForce);
+
+    [DisplayStat(3, 5f, 20f, StatName = "Engine Power")]
+    private float GetEngineForceFloat() => EngineForce.z;
+
+
+    [DisplayStat(2, 2f, 30f, StatName = "Max Speed")]
     public float MaxSpeed = VehicleDefaults.MaxSpeed;
 
     public Vector3 GetAcceleration() => KineticPhysics.Acceleration(EngineForce, Mass);
+
+    
 
     [Header("Steering")]
     public float MinTurnRadius = VehicleDefaults.MinTurnRadius;
