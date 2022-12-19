@@ -6,7 +6,9 @@ using UnityEngine.InputSystem;
 
 public class VehicleInput
 {
-    static float lastKeyboardSteerValue = 0f;
+    static float keyboardSteeringValue = 0f;
+    public const float KeyboardTimeToMaxTurn = 1f;
+
     /// <summary>
     /// Mimics how Input.GetAxis() worked
     /// <br/><br/>
@@ -15,29 +17,30 @@ public class VehicleInput
     /// <param name="horizontalInput">The input value from an input device</param>
     /// <returns>The new direction of the steering wheel</returns>
     public static float KeyboardSteering(float horizontalInput) {
-        float keyboardSteering = VehicleDefaults.KeyboardTimeToMaxTurn * Time.deltaTime;
+        float keyboardSteeringStep = Time.deltaTime / KeyboardTimeToMaxTurn;
         switch (horizontalInput) {
             case 1:
-                lastKeyboardSteerValue += keyboardSteering;
+                keyboardSteeringValue += keyboardSteeringStep;
                 break;
             case -1:
-                lastKeyboardSteerValue += -keyboardSteering;
+                keyboardSteeringValue += -keyboardSteeringStep;
                 break;
             case 0:
                 // corner case where adding/subtracting keyboardSteering will cause currentSteering to 
                 // flip back and forth around 0
-                if (lastKeyboardSteerValue > -keyboardSteering && lastKeyboardSteerValue < keyboardSteering) {
-                    lastKeyboardSteerValue = 0f;
-                } else if (lastKeyboardSteerValue > 0) {
-                    lastKeyboardSteerValue += -keyboardSteering;
+                if (keyboardSteeringValue > -keyboardSteeringStep && keyboardSteeringValue < keyboardSteeringStep) {
+                    keyboardSteeringValue = 0f;
+                } else if (keyboardSteeringValue > 0) {
+                    keyboardSteeringValue += -keyboardSteeringStep;
                 } else {
-                    lastKeyboardSteerValue += keyboardSteering;
+                    keyboardSteeringValue += keyboardSteeringStep;
                 }
                 break;
             default:
                 break;
         }
-        return Mathf.Clamp(lastKeyboardSteerValue, -1f, 1f);
+        keyboardSteeringValue = Mathf.Clamp(keyboardSteeringValue, -1f, 1f);
+        return keyboardSteeringValue;
     }
 
     public static float JoystickSteering(float horizontalInput) {
@@ -49,7 +52,7 @@ public class VehicleInput
         if (currentControlScheme == "Keyboard") {
             return KeyboardSteering;
         } else {
-            lastKeyboardSteerValue = 0f;
+            keyboardSteeringValue = 0f;
             return JoystickSteering;
         }
     }
