@@ -14,7 +14,7 @@ public class VehicleMovement {
     float maxDrivingSpeed = 0f;
     public float MaxSpeedModifier = 1f;
     /// <summary>A value ranging from -1 to 1. Negative is left, positive is right</summary>
-    float steeringValue = 0f;
+    public float steeringValue = 0f;
     /// <summary>Negative is left, positive is right</summary>
     float turnRadius = 0f;
     VehicleSO vehicleSO;
@@ -67,32 +67,37 @@ public class VehicleMovement {
         return Vector3.RotateTowards(vector, sign * transform.forward, 2 * Mathf.PI, 0f);
     }
 
-    public Vector3 CircleMovementCenter() => transform.position + (transform.right * turnRadius);
-
-    Vector3 GetCircleMovement(float deltaTime) {
-        Vector3 movementCircleCenter = CircleMovementCenter();
-        Debug.Log(velocity);
-        float angleToMoveBy = (velocity.z / turnRadius) * deltaTime * Mathf.Rad2Deg;
-        Vector3 newPositionOnCircle = Quaternion.AngleAxis(angleToMoveBy, transform.up) * -transform.right * turnRadius;
-        Vector3 newPosition = newPositionOnCircle + movementCircleCenter;
-        UpdateRotation();
-        return newPosition;
-
-        void UpdateRotation() {
-            // I may be wrong here, but I don't think the car should update its x or z rotation in its own control method (unless its a plane-car)
-            // If the cars yaw is changing, it should be from outside sources
-            Vector3 normalizedPosition = transform.position - movementCircleCenter;
-            Vector3 normalizedNewPosition = newPosition - movementCircleCenter;
-            float yAxisRotation = Vector2.Angle(new Vector2(normalizedNewPosition.x, normalizedNewPosition.z), new Vector2(normalizedPosition.x, normalizedPosition.z));
-            Vector3 rotateBy = new Vector3(transform.rotation.x, yAxisRotation, transform.rotation.z);
-            rotateBy = rotateBy * (IsTurningRight() ? 1 : -1);
-            transform.Rotate(rotateBy);
-        }
+    public Vector3 CircleMovementCenter(float? turnRadius = null) {
+        turnRadius ??= this.turnRadius;
+        return transform.position + (transform.right * turnRadius.Value);
     }
 
-    public bool IsTurning() => turnRadius != 0;
+    public float AngleToMoveBy(float deltaTime, Vector3? velocity = null, float? turnRadius = null) {
+        velocity ??= this.velocity;
+        turnRadius ??= this.turnRadius;
+        return (velocity.Value.z / turnRadius.Value) * deltaTime* Mathf.Rad2Deg;
+    }
 
-    bool IsTurningRight() => turnRadius > 0;
+    public Vector3 GetCircleMovement(float deltaTime, float? turnRadius = null, bool updateRotation = true) {
+        turnRadius ??= this.turnRadius;
+        Vector3 movementCircleCenter = CircleMovementCenter(turnRadius);
+        Vector3 newPositionOnCircle = Quaternion.AngleAxis(AngleToMoveBy(deltaTime), transform.up) * -transform.right * turnRadius.Value;
+        Vector3 newPosition = newPositionOnCircle + movementCircleCenter;
+        if (updateRotation) transform.Rotate(CalcCirleMovementRotation(movementCircleCenter, newPosition));
+        return newPosition;
+    }
+
+    public Vector3 CalcCirleMovementRotation(Vector3 circleCenter, Vector3 newPositionOnCircle) {
+        Vector3 normalizedPosition = transform.position - circleCenter;
+        Vector3 normalizedNewPosition = newPositionOnCircle - circleCenter;
+        float yAxisRotation = Vector2.Angle(new Vector2(normalizedNewPosition.x, normalizedNewPosition.z), new Vector2(normalizedPosition.x, normalizedPosition.z));
+        Vector3 rotateBy = new Vector3(transform.rotation.x, yAxisRotation, transform.rotation.z);
+        return rotateBy * (IsTurningRight() ? 1f : -1f);
+    }
+
+    public bool IsTurning() => steeringValue != 0;
+
+    public bool IsTurningRight() => steeringValue > 0f;
 
     bool IsMovingForwards() => velocity.z > 0f;
 
@@ -124,7 +129,7 @@ public class VehicleMovement {
         return vehicleSO.EngineForce * input.VerticalInput * coefficientOfFriction * vehicleSO.WheelTraction;
     }
 
-    Vector3 CalcNetForce(float coefficientOfFriction) {
+    public Vector3 CalcNetForce(float coefficientOfFriction) {
         return CalcEngineForce(coefficientOfFriction) + CalcFrictionForce(coefficientOfFriction);
     }
 
@@ -141,7 +146,7 @@ public class VehicleMovement {
         return Vector3.zero;
     }
 
-    Vector3 CalcVelocity(float deltaTime) {
+    public Vector3 CalcVelocity(float deltaTime) {
         velocity = KineticPhysics.Velocity(velocity, acceleration, deltaTime);
         velocity = velocity.RoundIfBasicallyZero();
         float maxSpeed = CalcMaxSpeed();
@@ -149,7 +154,7 @@ public class VehicleMovement {
     }
 
     /// <returns>A value from -1 to 1</returns>
-    float CalcSteeringValue() {
+    public float CalcSteeringValue() {
         float steering = input.SteeringMethod.Invoke(input.HorizontalInput);
         return steering * vehicleSO.SteeringModifier;
     }
@@ -158,12 +163,14 @@ public class VehicleMovement {
 
     /// <returns>Returns a negative value if turning left, and a positive one if turning right</returns>
     // FIXME: this function sucks. I (kenny) don't think it feels good to turn the car using this calculation
-    float CalcTurnRadius() {
+    public float CalcTurnRadius(float? steeringValue = null, Vector3? velocity = null) {
+        steeringValue ??= this.steeringValue;
+        velocity ??= this.velocity;
         if (steeringValue == 0f)
             return 0f;
         float turnRadius = vehicleSO.MinTurnRadius;
-        turnRadius *= (Mathf.Sign(velocity.z)) * (1f + velocity.magnitude);
-        turnRadius /= (Mathf.Sign(steeringValue) * (Math.Abs(steeringValue)));
+        turnRadius *= (Mathf.Sign(velocity.Value.z)) * (1f + velocity.Value.magnitude);
+        turnRadius /= (Mathf.Sign(steeringValue.Value) * (Math.Abs(steeringValue.Value)));
         return turnRadius;
         //return Mathf.Clamp(steeringValue * velocity.magnitude, vehicleSO.MinTurnRadius, float.MaxValue);// * 5f;
     }

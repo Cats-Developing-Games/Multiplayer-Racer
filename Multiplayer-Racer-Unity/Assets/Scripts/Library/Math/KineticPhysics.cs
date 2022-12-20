@@ -50,6 +50,39 @@ public static class KineticPhysics {
 
     #endregion
 
+    #region Momentum
+
+    public static Vector3 Momentum(float mass, Vector3 velocity) {
+        return mass * velocity;
+    }
+
+    #endregion
+
+    #region Collision
+
+    /// <summary>
+    /// <b>Original Equation</b> - Conservation of momentum
+    /// <br/><br/>
+    /// p1_initial + p2_initial = p1_final + p2_final
+    /// <br/><br/>
+    /// <b>Derived Equation Used</b>
+    /// <br/><br/>
+    /// m1*v1_initial + m2*v2_initial = m1*(v2_final - (v2_initial - v1_initial)) + m2*v2_final
+    /// <br/><br/>
+    /// <b>Where</b>
+    /// <br/><br/>
+    /// p = momentum = m * v = mass * velocity
+    /// <br/><br/>
+    /// <see href="https://www.youtube.com/watch?v=okFcjFD5umU"/>
+    /// </summary>
+    //public static Vector3 ElasticCollisionVelocity(float mass1, Vector3 velocity1, float mass2, Vector3 velocity2) {
+    //    Vector3 p_initial = Momentum(mass1, velocity1) + Momentum(mass2, velocity2);
+    //    Vector3 p_final =
+    //    return Vector3.zero;
+    //}
+
+    #endregion
+
     #region Force
 
     /// <summary>Calculate the force of gravity</summary>
