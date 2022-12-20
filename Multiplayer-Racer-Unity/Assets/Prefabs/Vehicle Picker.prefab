@@ -199,6 +199,7 @@ GameObject:
   - component: {fileID: 8836356520747160586}
   - component: {fileID: 5202594811517314078}
   - component: {fileID: 148222816274151514}
+  - component: {fileID: 4443340409955701218}
   m_Layer: 0
   m_Name: Vehicle Picker
   m_TagString: Untagged
@@ -252,7 +253,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 799c58e5dde48e246931a8de023f781b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerCamera: {fileID: 5202594812588573499}
   previewAnchor: {fileID: 4285064024567811614}
   vehicles:
   - {fileID: 11400000, guid: 4f0bc513841d6f5499f3b3c05bfb6b76, type: 2}
@@ -268,6 +268,19 @@ MonoBehaviour:
   statsViewer: {fileID: 5956665110226983981}
   PlayerReady:
     m_InternalValue: 0
+--- !u!114 &4443340409955701218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 971150092484263162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f82759543215ebe4aaa26f16541129d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controlledCamera: {fileID: 5202594812588573499}
 --- !u!1 &1122774748096979832
 GameObject:
   m_ObjectHideFlags: 0
@@ -1699,7 +1712,7 @@ Camera:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1
+    width: 0.75
     height: 1
   near clip plane: 0.3
   far clip plane: 1000

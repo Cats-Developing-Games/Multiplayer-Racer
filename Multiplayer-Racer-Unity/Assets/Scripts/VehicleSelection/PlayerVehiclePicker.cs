@@ -11,7 +11,6 @@ using TMPro;
 
 public class PlayerVehiclePicker : NetworkBehaviour
 {
-    [SerializeField] private Camera playerCamera;
     [SerializeField] private GameObject previewAnchor;
     [SerializeField] private List<VehicleSO> vehicles;
     [SerializeField] private GameObject[] hideWhenNotOwner;
@@ -132,21 +131,5 @@ public class PlayerVehiclePicker : NetworkBehaviour
     [ServerRpc] private void SelectPreviousVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value - 1);
 
     #endregion
-
-    #region Camera Viewbox
-    public void SetCameraRect(Rect cameraRect, float time = 0f)
-    {
-        if (time != 0f) throw new NotImplementedException();
-
-        SetCameraRectClientRpc(cameraRect.x, cameraRect.y, cameraRect.width, cameraRect.height, time);
-    }
-
-    [ClientRpc]
-    private void SetCameraRectClientRpc(float x, float y, float width, float height, float time = 0f)
-    {
-        var rect = new Rect(x, y, width, height);
-
-        playerCamera.rect = rect;
-    }
-    #endregion
 }
+
