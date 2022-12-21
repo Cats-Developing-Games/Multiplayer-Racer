@@ -1,3 +1,4 @@
+using System.Threading;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,15 +9,6 @@ using UnityEngine.SceneManagement;
 
 public class MulticamGrid : NetworkBehaviour
 {
-    private int rows { get; set; } = 0;
-    private int columns { get; set; } = 0;
-
-    // public override void OnNetworkSpawn()
-    // {
-    //     if (!IsServer) return;
-    //     var nm = NetworkManager.Singleton;
-    // }
-
     [ClientRpc]
     public void RecalculateCameraRectsClientRpc()
     {
@@ -27,10 +19,9 @@ public class MulticamGrid : NetworkBehaviour
     {
         var discoveredCameras = DiscoverCameras(cameraToIgnore);
 
-        Debug.Log("Discovered Count: " + discoveredCameras.Count);
-
+        Debug.Log($"Found {discoveredCameras.Count} cameras");
         var cameraBounds = CreateViewportRectsForClients(discoveredCameras);
-        for (int i = 0; i < cameraBounds.Count; i++)
+        for (int i = 0; i < discoveredCameras.Count; i++)
         {
             discoveredCameras[i].SetCameraRect(cameraBounds[i]);
         }
@@ -41,8 +32,6 @@ public class MulticamGrid : NetworkBehaviour
         List<MulticamGridCamera> cameras = new List<MulticamGridCamera>();
         foreach (GameObject go in SceneManager.GetActiveScene().GetRootGameObjects())
         {
-            // Debug.Log("Found go: " + go.name);
-
             if (go.TryGetComponent<MulticamGridCamera>(out MulticamGridCamera cam) && cam != cameraToIgnore)
             {
                 cameras.Add(cam);
@@ -60,28 +49,47 @@ public class MulticamGrid : NetworkBehaviour
         var output = new List<Rect>();
         if (total == 0) return output;
 
-        var width = 1f / total;
+        float width = Screen.width;
+        float height = Screen.height;
 
-        for (int i = 0; i < total; i++)
+        float targetRatio = 1f;
+
+        float bestDistance = float.MaxValue;
+        var (bestRows, bestColumns) = (1, 1);
+
+        for(int columns = 1; columns <= total; columns++) {
+            int rows = Mathf.CeilToInt(total / (float)columns);
+
+            // Don't want to add more cells than is needed
+            if(columns != Mathf.CeilToInt(total / (float)rows)) continue;
+            
+            var testCellWidth = width / columns;
+            var testCellHeight = height / rows;
+
+            var ratio = testCellHeight / testCellWidth;
+
+            var distanceToTarget = Mathf.Abs(targetRatio - ratio);
+
+            if(distanceToTarget < bestDistance) {
+                bestDistance = distanceToTarget;
+                (bestRows, bestColumns) = (rows, columns);
+            }            
+        }
+
+        Debug.Log($"Best row {bestRows} by {bestColumns}");
+
+        float rectWidth = 1f / bestColumns;
+        float rectHeight = 1f / bestRows;
+        for (int columns = 0; columns < bestColumns; columns++)
         {
-            var offset = width * i;
+            for (int rows = bestRows - 1; rows >= 0; rows--) {
+                var xOffset = rectWidth * columns;
+                var yOffset = rectHeight * rows;
 
-            output.Add(new Rect(offset, 0, width, 1f));
+                output.Add(new Rect(xOffset, yOffset, rectWidth, rectHeight));
+            }
         }
 
         return output;
     }
-
-    // public void RegisterCamera(MulticamGridCamera cam)
-    // {
-    //     cam.NetworkCameraNumber.Value = GetNextCameraNumber();
-    // }
-
-    // private int GetNextCameraNumber() => discoveredCamera.Select(dc => dc.CameraNumber).DefaultIfEmpty(0).Max() + 1;
 }
-
-// public interface IControlCamera
-// {
-//     void SetCameraRect(Rect cameraRect, float time = 0f);
-//     int CameraNumber { get; }
-// }
