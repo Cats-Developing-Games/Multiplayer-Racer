@@ -22,7 +22,7 @@ public class VehicleSO : ScriptableObject
     //public float BreakDeceleration = DefaultBreakDeceleration;
 
     [Header("Traction")]
-    [Description("Traction is multiplied to the cars coefficient of friction")]
+    [Description("(Experimental) Traction is multiplied to the cars coefficient of friction")]
     // TODO: applying traction this way does not feel right, but I am not sure how it should be done
     // Also see ArcadePlayerController.calcFrictionCoefficient
     public float WheelTraction = VehicleDefaults.Traction;

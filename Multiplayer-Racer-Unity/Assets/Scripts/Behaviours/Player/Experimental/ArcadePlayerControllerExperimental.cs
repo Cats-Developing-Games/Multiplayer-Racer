@@ -15,7 +15,7 @@ public class ArcadePlayerControllerExperimental : NetworkBehaviour
     // TODO: change vehicle accel, velocity, and force calculations to be Vector3. not floats
 
     [Header("Vehicle")]
-    [Vehicle][SerializeField] VehicleSO vehicleSO;
+    [Foldout][SerializeField] VehicleSO vehicleSO;
 
     [Space]
     [Header("Camera")]

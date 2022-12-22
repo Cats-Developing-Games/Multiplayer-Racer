@@ -7,10 +7,10 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.BDE7F5D3" = "defa"
+	"last_search.BDE7F5D3" = "t:material stone"
 	"OpenInspectorPreview.BDE7F5D3" = "0"
 	"currentGroup.BDE7F5D3" = "all"
-	"last_search.982FBD6D" = "t:monoscript "
+	"last_search.982FBD6D" = "t:texture stone"
 	"OpenInspectorPreview.982FBD6D" = "0"
 	"currentGroup.982FBD6D" = "all"
 }
