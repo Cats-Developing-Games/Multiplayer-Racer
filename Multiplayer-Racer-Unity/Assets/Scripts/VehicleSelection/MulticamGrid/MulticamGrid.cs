@@ -112,7 +112,7 @@ public class MulticamGrid : NetworkBehaviour
                 var yOffset = rectHeight * rows;
 
                 var targetRect = new Rect(xOffset, yOffset, rectWidth, rectHeight);
-                Rect optionalSourceRect = new Rect(newRowAdded ? 1f : xOffset, newColumnAdded ? -rectHeight : yOffset, rectWidth, rectHeight);
+                Rect optionalSourceRect = new Rect(newColumnAdded ? 1f : xOffset, newRowAdded ? -rectHeight : yOffset, rectWidth, rectHeight);
 
                 output.Add((targetRect, optionalSourceRect));
             }
