@@ -29,10 +29,16 @@ public class MulticamGrid : NetworkBehaviour
     {
         var discoveredCameras = DiscoverCameras(cameraToIgnore);
 
-        Debug.Log($"Found {discoveredCameras.Count} cameras");
+        //Debug.Log($"Found {discoveredCameras.Count} cameras");
         var cameraBounds = CreateViewportRectsForClients(discoveredCameras);
         for (int i = 0; i < discoveredCameras.Count; i++)
         {
+            // Idea for improvement:
+            // Instead of playing the cameras into position by their index in scene,
+            // record their last placed col / row and try to preserve that each time
+            // This way when new columns are added, the rows are not disturbed
+            // I decided to not address this atm as cameras leaving would cause holes to appear
+            // and I'm not sure how to solve that case
             discoveredCameras[i].SetCameraRect(cameraBounds[i], animationSpeed);
         }
     }
@@ -45,7 +51,7 @@ public class MulticamGrid : NetworkBehaviour
             if (go.TryGetComponent<MulticamGridCamera>(out MulticamGridCamera cam) && cam != cameraToIgnore)
             {
                 cameras.Add(cam);
-                cam.OnCameraDestroy += RecalculateCameraRects;
+                if(cam.IsInitialPosition) cam.OnCameraDestroy += RecalculateCameraRects;
             }
         }
 
@@ -67,7 +73,7 @@ public class MulticamGrid : NetworkBehaviour
         float bestDistance = float.MaxValue;
         var (bestRows, bestColumns) = (1, 1);
 
-        Debug.Log($"Actual dimensions {width} x {height}");
+        //Debug.Log($"Actual dimensions {width} x {height}");
 
         for (int columns = 1; columns <= total; columns++)
         {
@@ -81,20 +87,20 @@ public class MulticamGrid : NetworkBehaviour
 
             var ratio = testCellHeight / testCellWidth;
 
-            Debug.Log($"Test row {rows} by {columns} with ratio: {ratio} with sides {testCellWidth} x {testCellHeight}");
+            //Debug.Log($"Test row {rows} by {columns} with ratio: {ratio} with sides {testCellWidth} x {testCellHeight}");
 
 
             var distanceToTarget = Mathf.Abs(targetRatio - ratio);
 
             if (distanceToTarget < bestDistance)
             {
-                Debug.Log("Updating Best");
+                //Debug.Log("Updating Best");
                 bestDistance = distanceToTarget;
                 (bestRows, bestColumns) = (rows, columns);
             }
         }
 
-        Debug.Log($"Best row {bestRows} by {bestColumns}");
+        //Debug.Log($"Best row {bestRows} by {bestColumns}");
 
         bool newRowAdded = bestRows != currentRows;
         bool newColumnAdded = bestColumns != currentColumns;
