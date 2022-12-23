@@ -18,7 +18,11 @@ public class VehicleSelectionSceneManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (!IsServer) return;
+        if (!IsServer)
+        {
+            NetworkManager.OnClientDisconnectCallback += (u) => SceneManager.LoadScene("MainMenuScene");
+            return;
+        }
         var nm = NetworkManager.Singleton;
         s_multicamGrid = GetComponent<MulticamGrid>();
         InitializePlayerVehiclePickers(nm.ConnectedClientsIds);
@@ -61,14 +65,6 @@ public class VehicleSelectionSceneManager : NetworkBehaviour
     private void RemoveClient(ulong clientId)
     {
         s_players.Remove(clientId);
-
-        var reducedClientIds = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds.Where(id => id != clientId));
-        if(reducedClientIds.Count == 0) {
-            // No players left
-            NetworkManager.Singleton.Shutdown();
-            SceneManager.LoadScene("MainMenuScene");
-        }
-        // s_multicamGrid.RecalculateCameraRectsClientRpc();
     }
 
     private PlayerVehiclePicker SpawnClientVehiclePicker(ulong clientId)
