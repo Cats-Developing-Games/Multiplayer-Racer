@@ -69,11 +69,11 @@ public class MulticamGridCamera : NetworkBehaviour
         // Determine initial position to use
         int horizontalSlideDirection = 0;
         if (rect.x == 0) horizontalSlideDirection = -1;
-        else if (rect.x + rect.width == 1) horizontalSlideDirection = 1;
+        else if (Math.Abs(rect.x + rect.width - 1) < .0005f) horizontalSlideDirection = 1;
 
         int verticalSlideDirection = 0;
         if (rect.y == 0) verticalSlideDirection = -1;
-        else if (rect.y + rect.height == 1) verticalSlideDirection = 1;
+        else if (Math.Abs(rect.y + rect.height - 1) < .0005f) verticalSlideDirection = 1;
 
         bool hasMultiRows = rect.height != 1f;
         bool hasMultiCols = rect.width != 1f;
@@ -81,6 +81,9 @@ public class MulticamGridCamera : NetworkBehaviour
         Vector2 horizontalOffsetRect = new Vector2(rect.x + horizontalSlideDirection * rect.width, rect.y);
         Vector2 verticalOffsetRect = new Vector2(rect.x, rect.y + verticalSlideDirection * rect.height);
         Vector2 offset;
+
+        //Debug.Log(rect);
+        //Debug.Log($"Hor slide: {horizontalSlideDirection}, Vert Slide: {verticalSlideDirection}. Has multi rows? [{hasMultiRows}]. Has Multi cols? [{hasMultiCols}]");
 
         // Priority is multiple rows
         if (hasMultiRows)
@@ -119,7 +122,7 @@ public class MulticamGridCamera : NetworkBehaviour
             }
         }
         else offset = Vector2.zero;
-        
+
         return new Rect(offset, new Vector2(rect.width, rect.height));
     }
 

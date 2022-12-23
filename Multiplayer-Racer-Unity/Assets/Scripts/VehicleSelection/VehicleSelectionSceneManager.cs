@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VehicleSelectionSceneManager : NetworkBehaviour
 {
@@ -62,6 +63,11 @@ public class VehicleSelectionSceneManager : NetworkBehaviour
         s_players.Remove(clientId);
 
         var reducedClientIds = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds.Where(id => id != clientId));
+        if(reducedClientIds.Count == 0) {
+            // No players left
+            NetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene("MainMenuScene");
+        }
         // s_multicamGrid.RecalculateCameraRectsClientRpc();
     }
 
