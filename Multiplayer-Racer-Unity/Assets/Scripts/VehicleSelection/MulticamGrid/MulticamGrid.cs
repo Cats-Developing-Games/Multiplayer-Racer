@@ -33,10 +33,7 @@ public class MulticamGrid : NetworkBehaviour
         var cameraBounds = CreateViewportRectsForClients(discoveredCameras);
         for (int i = 0; i < discoveredCameras.Count; i++)
         {
-            var (target, source) = cameraBounds[i];
-
-            discoveredCameras[i].SetInitializerPosition(source);
-            discoveredCameras[i].SetCameraRect(target, animationSpeed);
+            discoveredCameras[i].SetCameraRect(cameraBounds[i], animationSpeed);
         }
     }
 
@@ -55,11 +52,11 @@ public class MulticamGrid : NetworkBehaviour
         return cameras;
     }
 
-    private List<(Rect target, Rect optionalSource)> CreateViewportRectsForClients(List<MulticamGridCamera> cameras)
+    private List<Rect> CreateViewportRectsForClients(List<MulticamGridCamera> cameras)
     {
         var total = cameras.Count;
 
-        var output = new List<(Rect target, Rect optionalSource)>();
+        var output = new List<Rect>();
         if (total == 0) return output;
 
         float width = Display.main.renderingWidth;
@@ -112,9 +109,8 @@ public class MulticamGrid : NetworkBehaviour
                 var yOffset = rectHeight * rows;
 
                 var targetRect = new Rect(xOffset, yOffset, rectWidth, rectHeight);
-                Rect optionalSourceRect = new Rect(newColumnAdded ? 1f : xOffset, newRowAdded ? -rectHeight : yOffset, rectWidth, rectHeight);
 
-                output.Add((targetRect, optionalSourceRect));
+                output.Add(targetRect);
             }
         }
 

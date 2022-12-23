@@ -16,25 +16,11 @@ public class MulticamGridCamera : NetworkBehaviour
     public Action<MulticamGridCamera> OnCameraDestroy;
     [SerializeField] private Camera controlledCamera;
 
-    private Rect? initializerRect = null;
-
-    public void SetInitializerPosition(Rect sourceRect)
-    {
-        initializerRect = sourceRect;
-    }
-
     public void SetCameraRect(Rect cameraRect, float time = 0f)
     {
         if (isInitialPosition && time != 0)
         {
-            if (initializerRect != null)
-            {
-                controlledCamera.rect = initializerRect.Value;
-            }
-            else
-            {
-                controlledCamera.rect = DetermineInitialRectPosition(cameraRect);
-            }
+            controlledCamera.rect = DetermineInitialRectPosition(cameraRect);
         }
         isInitialPosition = false;
 
@@ -81,54 +67,59 @@ public class MulticamGridCamera : NetworkBehaviour
     private Rect DetermineInitialRectPosition(Rect rect)
     {
         // Determine initial position to use
-        int xScalar = 0;
-        if (rect.x == 0) xScalar = -1;
-        else if (rect.x + rect.width == 1) xScalar = 1;
+        int horizontalSlideDirection = 0;
+        if (rect.x == 0) horizontalSlideDirection = -1;
+        else if (rect.x + rect.width == 1) horizontalSlideDirection = 1;
 
-        int yScalar = 0;
-        if (rect.y == 0) yScalar = -1;
-        else if (rect.y + rect.height == 1) yScalar = 1;
+        int verticalSlideDirection = 0;
+        if (rect.y == 0) verticalSlideDirection = -1;
+        else if (rect.y + rect.height == 1) verticalSlideDirection = 1;
 
+        bool hasMultiRows = rect.height != 1f;
+        bool hasMultiCols = rect.width != 1f;
 
-        Vector2 horizontalOffsetRect = new Vector2(rect.x + xScalar * rect.width, rect.y);
-        Vector2 verticalOffsetRect = new Vector2(rect.x, rect.y + yScalar * rect.height);
+        Vector2 horizontalOffsetRect = new Vector2(rect.x + horizontalSlideDirection * rect.width, rect.y);
+        Vector2 verticalOffsetRect = new Vector2(rect.x, rect.y + verticalSlideDirection * rect.height);
         Vector2 offset;
 
-        if (yScalar == -1)
+        // Priority is multiple rows
+        if (hasMultiRows)
         {
-            // Prefer to slide in from bottom
-            offset = verticalOffsetRect;
-        }
-        else if (xScalar == 1)
-        {
-            // Second preference is to slide in from right side
-            offset = horizontalOffsetRect;
-        }
-        else if (xScalar != 0 && yScalar != 0)
-        {
-            // Need to determine whichever distance would be shorted and slid in based on that direction
-            var actualWidth = Screen.width * rect.width;
-            var actualHeight = Screen.height * rect.height;
-
-            if (actualWidth < actualHeight)
+            if (verticalSlideDirection != 0)
             {
-                // Scroll in horizontally
+                // Prefer to slide in from top / bottom
+                offset = verticalOffsetRect;
+            }
+            else if (horizontalSlideDirection != 0)
+            {
                 offset = horizontalOffsetRect;
             }
             else
             {
-                // Scroll in vertically
-                offset = verticalOffsetRect;
+                // The position of the cell is in the center of the grid. No good choice, so slide in from wherever
+                offset = new Vector2(rect.x < .5f ? -rect.width : 1f, rect.y);
             }
         }
-        else if (xScalar != 0) offset = horizontalOffsetRect;
-        else if (yScalar != 0) offset = verticalOffsetRect;
-        else
+        /// Priority is multiple columns
+        else if (hasMultiCols)
         {
-            // The position of the cell is in the center of the grid. No good choice, so slide in from wherever
-            offset = new Vector2(rect.x < .5f ? -rect.width : 1f, rect.y);
+            if (horizontalSlideDirection != 0)
+            {
+                offset = horizontalOffsetRect;
+            }
+            else if (verticalSlideDirection != 0)
+            {
+                // Prefer to slide in from top / bottom
+                offset = verticalOffsetRect;
+            }
+            else
+            {
+                // The position of the cell is in the center of the grid. No good choice, so slide in from wherever
+                offset = new Vector2(rect.x < .5f ? -rect.width : 1f, rect.y);
+            }
         }
-
+        else offset = Vector2.zero;
+        
         return new Rect(offset, new Vector2(rect.width, rect.height));
     }
 
