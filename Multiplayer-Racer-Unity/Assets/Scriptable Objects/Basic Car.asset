@@ -16,5 +16,5 @@ MonoBehaviour:
   EngineForce: {x: 0, y: 0, z: 3000}
   MaxSpeed: 20
   MinTurnRadius: 0.5
-  SteeringModifier: 1
+  SteeringAngle: 65
   WheelTraction: 1

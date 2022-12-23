@@ -137,7 +137,11 @@ public class VehicleMovementRigidbody {
         if (input.IsBreaking) {
             return Vector3.zero;
         }
-        return vehicleSO.EngineForce * input.VerticalInput * coefficientOfFriction * vehicleSO.WheelTraction;
+        return DirectionOfEngineForce() * vehicleSO.EngineForce * input.VerticalInput * coefficientOfFriction * vehicleSO.WheelTraction;
+        
+        Vector3 DirectionOfEngineForce() {
+            return Quaternion.AngleAxis(steeringValue, transform.up) * transform.forward;
+        }
     }
 
     public Vector3 CalcNetForce(float coefficientOfFriction) {
@@ -167,7 +171,7 @@ public class VehicleMovementRigidbody {
     /// <returns>A value from -1 to 1</returns>
     public float CalcSteeringValue() {
         float steering = input.SteeringMethod.Invoke(input.HorizontalInput);
-        return steering * vehicleSO.SteeringModifier;
+        return steering * vehicleSO.SteeringAngle;
     }
 
     float CalcMaxSpeed() => NoMaxSpeed ? float.MaxValue : vehicleSO.MaxSpeed * MaxSpeedModifier;

@@ -530,12 +530,13 @@ MonoBehaviour:
   transformToMove: {fileID: 6778368379724570093}
   collision: {fileID: 1370480429161914066}
   useGravity: 0
+  DontUseCircleBasedMovement: 0
   RoadFrictionCoefficient: 0.7
   follow: 0
   lookAt: 0
-  DrawDrivingDirection: 0
-  DrawMininumTurnRadius: 0
-  DrawDriveableIcon: 1
+  DrawDrivingDirection: 1
+  DrawMininumTurnRadius: 1
+  DrawDriveableIcon: 0
   NoRollingFriction: 0
   NoMaxSpeed: 0
 --- !u!114 &6231593071155902253
@@ -660,7 +661,7 @@ MonoBehaviour:
   rb: {fileID: 5384298458165002609}
   groundCheckRayDistance: 0.1
   groundCheckRayOffset: 0.05
-  DrawGizmos: 1
+  DrawGizmos: 0
   OnGroundedChanged:
     m_PersistentCalls:
       m_Calls: []

@@ -18,8 +18,9 @@ public class ArcadeCarController : NetworkBehaviour
     [SerializeField] VehicleCollisionBehaviour collision;
     [Description("If the VehicleCollisionBehaviour's Rigidbodies gravity is flagged, this will automatically be disabled")]
     [SerializeField] bool useGravity = false;
+    [Description("Experimental")]
+    [SerializeField] bool DontUseCircleBasedMovement = false;
 
-    [Space]
     [Header("Environment")]
     // temporary. should be passed from outside this class
     public float RoadFrictionCoefficient = 0.7f;
@@ -64,7 +65,9 @@ public class ArcadeCarController : NetworkBehaviour
         else {
             if (collision.Rigidbody.useGravity) useGravity = false;
         }
-        movement = new ArcadeVehicleMovement(vehicleSO, input, transformToMove, collision, useGravity);
+        movement = new ArcadeVehicleMovement(vehicleSO, input, transformToMove, collision);
+        movement.GravityEnabled = useGravity;
+        movement.OnlyVelocityBasedMovement = DontUseCircleBasedMovement;
         movement.NoRollingFriction = NoRollingFriction;
         movement.NoMaxSpeed = NoMaxSpeed;
     }

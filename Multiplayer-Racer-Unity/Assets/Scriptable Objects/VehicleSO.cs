@@ -8,14 +8,14 @@ public class VehicleSO : ScriptableObject
     public float Mass = VehicleDefaults.Mass;
 
     [Header("Engine")]
-    public Vector3 EngineForce = VehicleDefaults.EngineForce;
+    public float EngineForce = VehicleDefaults.EngineForce;
     public float MaxSpeed = VehicleDefaults.MaxSpeed;
-
-    public Vector3 GetAcceleration() => KineticPhysics.Acceleration(EngineForce, Mass);
 
     [Header("Steering")]
     public float MinTurnRadius = VehicleDefaults.MinTurnRadius;
-    public float SteeringModifier = VehicleDefaults.SteeringModifier;
+    [Range(0f, 90f)]
+    /// <summary>Degrees</summary>
+    public float SteeringAngle = VehicleDefaults.SteeringAngle;
 
     //[Header("Breaking")]
     //public static readonly float DefaultBreakDeceleration = 10f;
@@ -36,13 +36,15 @@ struct VehicleDefaults {
     public const float Mass = 1360f;
 
     // Engine
-    public static readonly Vector3 EngineForce = new Vector3(0f, 0f, 3000f);
+    /// <summary>Assumed to be applied in the Z direction</summary>
+    public const float EngineForce = 3000f;
     public const float MaxSpeed = 10f;
     public const float Acceleration = 10f;
 
     // Steering
     public const float MinTurnRadius = 1f;
-    public const float SteeringModifier = 1f;
+    /// <summary>Degrees</summary>
+    public const float SteeringAngle = 65f;
 
     // Traction
     public const float Traction = 1f;
