@@ -3,41 +3,41 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArcadeVehicleMovement {
+public class ArcadeVehicleMovementExperimental {
 
     #region Movement Variables
-
-    public static float RollingFrictionModifier = 0.01f;
 
     /// <summary>Relative to the vehicles rotation</summary>
     Vector3 acceleration = new Vector3();
     /// <summary>Relative to the vehicles rotation</summary>
-    public float AccelerationModifier = 1f;
-    /// <summary>Relative to the vehicles rotation</summary>
-    public float VelocityModifier = 1f;
+    public Vector3 AccelerationModifier = new Vector3(1f, 1f, 1f);
     /// <summary>Relative to the vehicles rotation</summary>
     Vector3 velocity = new Vector3();
     public float MaxSpeedModifier = 1f;
     /// <summary>A value ranging from -1 to 1. Negative is left, positive is right</summary>
     public float steeringValue = 0f;
+    public float steeringAngle = 0f;
     /// <summary>Negative is left, positive is right</summary>
     float turnRadius = 0f;
     public Vector3 CircleMovementCenter;
 
     /// <summary>Acceleration is applied to the vehicles local direction. When applying worldspace vectors, rotate them accordingly (see transform.TransformDirection)</summary>
-    Dictionary<string, VectorCalc> Accelerations;
+    public Dictionary<string, Func<float, Vector3>> Accelerations;
 
     #endregion
 
     #region Prefab sourced variables
 
-    VehicleSO vehicleSO;
+    VehicleSOExperimental vehicleSO;
     VehicleInputHandler input;
     VehicleCollisionBehaviour collision;
     /// <summary>The vehicles transform</summary>
     Transform transform;
 
     #endregion
+
+    bool useGravity;
+    public bool OnlyVelocityBasedMovement = true;
 
     // Cheats
     /// <summary>Whether or not the vehicle experiences deceleration when no input is received</summary>
@@ -50,41 +50,59 @@ public class ArcadeVehicleMovement {
     /// <summary>Negative is left, positive is right</summary>
     public float TurnRadius { get => turnRadius; }
 
+    public bool GravityEnabled {
+        get => useGravity;
+        set {
+            useGravity = value;
+            if (useGravity) {
+                AddAcceleration(GRAVITY_ACCEL_KEY, CalcGravitationalAcceleration);
+                AddAcceleration(NORMAL_ACCEL_KEY, CalcNormalAcceleration);
+            } else {
+                RemoveAcceleration(GRAVITY_ACCEL_KEY);
+                RemoveAcceleration(NORMAL_ACCEL_KEY);
+            }
+        }
+    }
+
     public const string GRAVITY_ACCEL_KEY = "gravity";
     public const string NORMAL_ACCEL_KEY = "normal";
     public const string ENGINE_ACCEL_KEY = "engine";
 
     /// <summary>Handles all calculations, physics, and placements of moving an Arcade style vehicle</summary>
     /// <param name="useGravity">If using a rigidbody to calculate gravity, then useGravity should probably be false</param>
-    public ArcadeVehicleMovement(VehicleSO vehicleSO, VehicleInputHandler input, Transform transform, VehicleCollisionBehaviour collision) {
+    public ArcadeVehicleMovementExperimental(VehicleSOExperimental vehicleSO, VehicleInputHandler input, Transform transform, VehicleCollisionBehaviour collision) {
         this.vehicleSO = vehicleSO;
         turnRadius = vehicleSO.MinTurnRadius;
         this.input = input;
         this.transform = transform;
         this.collision = collision;
-        Accelerations = new Dictionary<string, VectorCalc>();
-        AddAcceleration(ENGINE_ACCEL_KEY, CalcAccelerationFromVehicle);
+        Accelerations = new Dictionary<string, Func<float, Vector3>>();
+        Accelerations.Add(ENGINE_ACCEL_KEY, CalcAccelerationFromVehicle);
     }
 
     public Vector3 GetMove(float deltaTime, float coefficientOfFriction) {
-        acceleration = ResolveAccelerations(coefficientOfFriction);
-        velocity = CalcVelocity(deltaTime, null, acceleration * AccelerationModifier);
-        steeringValue = CalcSteeringValue();
+        acceleration = Vector3.Scale(ResolveAccelerations(coefficientOfFriction), AccelerationModifier);
+        velocity = CalcVelocity(deltaTime);
+        steeringAngle = CalcSteeringAngle();
 
         Vector3 newPosition;
-        turnRadius = CalcTurnRadius();
+        if (OnlyVelocityBasedMovement) {
+            newPosition = GetPureVelocityBasedMovement(deltaTime);
+        } else {
+            turnRadius = CalcTurnRadius();
 
-        if (IsTurning())
-            newPosition = GetCircleMovement(deltaTime, velocity * VelocityModifier);
-        else
-            newPosition = GetStraightMovement(deltaTime, velocity * VelocityModifier, acceleration * AccelerationModifier);
+            if (IsTurning())
+                newPosition = GetCircleMovement(deltaTime);
+            else
+                newPosition = GetStraightMovement(deltaTime);
+        }
 
         return newPosition;
     }
 
-    public void AddAcceleration(string key, Func<float, Vector3> accelerationCalc) {
+    public void AddAcceleration(string key, Func<float, Vector3> acceleration) {
         if (Accelerations.ContainsKey(key)) return;
-        Accelerations.Add(key, new VectorCalc(key, accelerationCalc));
+        Accelerations.Add(key, acceleration);
     }
 
     public void RemoveAcceleration(string key) {
@@ -92,10 +110,19 @@ public class ArcadeVehicleMovement {
         Accelerations.Remove(key);
     }
 
-    Vector3 GetStraightMovement(float deltaTime, Vector3? velocity = null, Vector3? acceleration = null) {
-        velocity ??= this.velocity;
-        acceleration ??= this.acceleration;
-        Vector3 displacement = RotateToZAxis(KineticPhysics.Displacement(velocity.Value, acceleration.Value, deltaTime));
+    Vector3 GetPureVelocityBasedMovement(float deltaTime) {
+        Vector3 displacement = KineticPhysics.Displacement(velocity, acceleration, deltaTime);
+        Vector3 newPosition = transform.position + displacement;
+        //Vector3 lookAt = IsMovingForwards() ? transform.position + displacement : transform.position - displacement;
+        //transform.LookAt(lookAt);
+        //Vector3.
+        //float yaw = Vector3.Angle(transform.forward.y, velocity.);
+        //transform.Rotate();
+        return newPosition;
+    }
+
+    Vector3 GetStraightMovement(float deltaTime) {
+        Vector3 displacement = RotateToZAxis(KineticPhysics.Displacement(velocity, acceleration, deltaTime));
         return transform.position + displacement;
     }
 
@@ -104,11 +131,10 @@ public class ArcadeVehicleMovement {
         return Vector3.RotateTowards(vector, sign * transform.forward, 2 * Mathf.PI, 0f);
     }
 
-    Vector3 GetCircleMovement(float deltaTime, Vector3? velocity = null, float? turnRadius = null, bool updateRotation = true) {
-        velocity ??= this.velocity;
+    Vector3 GetCircleMovement(float deltaTime, float? turnRadius = null, bool updateRotation = true) {
         turnRadius ??= this.turnRadius;
         CircleMovementCenter = CalcCircleMovementCenter(turnRadius);
-        float angleToMoveBy = AngleToMoveBy(deltaTime, velocity, turnRadius);
+        float angleToMoveBy = AngleToMoveBy(deltaTime);
         // TODO: moving backwards inverts the steering. this is not correct
         // For example: steering left and moving backwards moves the car backwards to the RIGHT (should be left)
         // please hwelp me Mike
@@ -140,56 +166,64 @@ public class ArcadeVehicleMovement {
         return rotateBy * (IsTurningRight() ? 1f : -1f);
     }
 
-    public bool IsTurning() => steeringValue != 0f;
+    public bool IsTurning() => steeringAngle != 0f;
 
-    public bool IsTurningRight() => steeringValue > 0f;
+    public bool IsTurningRight() => steeringAngle > 0f;
 
-    public bool IsMovingForwards() => velocity.z > 0f;
+    public bool IsMovingForwards() {
+        if (OnlyVelocityBasedMovement)
+            return Vector3.Dot(transform.forward, velocity) > 0f;
+        else
+            return velocity.z > 0f;
+    }
 
-    public bool IsMovingBackwards() => velocity.z < 0f;
+    public bool IsMovingBackwards() {
+        if (OnlyVelocityBasedMovement)
+            return Vector3.Dot(transform.forward, velocity) < 0f;
+        else
+            return velocity.z < 0f;
+    }
 
-    Vector3 CalcFrictionForce(float coefficientOfFriction, Vector3? velocity = null) {
-        velocity ??= this.velocity;
-        
+    Vector3 CalcFrictionForce(float coefficientOfFriction) {
+        if (input.IsBreaking) {
+            return CalcBreakForce(coefficientOfFriction);
+        }
         // TODO: rolling friction (natural deceleration) is applied as a constant decel in CalcAcceleration()
         // I'm really not sure how to properly calculate rolling friction
         //if (input.VerticalInput == 0) { // Rolling friction
         //    return Vector3.zero;
         //}
-        //Vector3 frictionForce = KineticPhysics.NormalForce(vehicleSO.Mass, transform);
-        //frictionForce = frictionForce * input.VerticalInput * coefficientOfFriction * RollingFrictionModifier;
-        //frictionForce = Vector3.RotateTowards(frictionForce, Vector3.back, (float)Math.PI, 0f);
-        //return frictionForce;
         return Vector3.zero;
     }
 
-    Vector3 CalcBreakForce(float coefficientOfFriction, Vector3? velocity = null) {
-        velocity ??= this.velocity;
-        Vector3 force = KineticPhysics.ForceOfFriction(velocity.Value, vehicleSO.Mass, transform, coefficientOfFriction * vehicleSO.WheelTraction);
+    Vector3 CalcBreakForce(float coefficientOfFriction) {
+        Vector3 force = KineticPhysics.ForceOfFriction(velocity, vehicleSO.Mass, transform, coefficientOfFriction * vehicleSO.WheelTraction);
         return force;
     }
 
     Vector3 CalcEngineForce(float coefficientOfFriction) {
         if (input.IsBreaking) {
-            return CalcBreakForce(coefficientOfFriction, velocity);
+            return Vector3.zero;
         }
-        Vector3 engineForce = new Vector3(0f, 0f, vehicleSO.EngineForce) * input.VerticalInput;
-        return engineForce;
+        if (OnlyVelocityBasedMovement)
+            return DirectionOfEngineForce() * vehicleSO.EngineForce * input.VerticalInput * coefficientOfFriction * vehicleSO.WheelTraction;
+        else
+            return new Vector3(0f, 0f, vehicleSO.EngineForce) * input.VerticalInput * coefficientOfFriction * vehicleSO.WheelTraction;
+
+        Vector3 DirectionOfEngineForce() {
+            return Quaternion.AngleAxis(steeringAngle, transform.up) * transform.forward;
+        }
     }
 
     Vector3 CalcNetForce(float coefficientOfFriction) {
-        Vector3 frictionForce = CalcFrictionForce(coefficientOfFriction);
-        Vector3 engineForce = CalcEngineForce(coefficientOfFriction);
-        float sign = engineForce.z > 0f ? 1f : -1f;
-        Vector3 netForce = engineForce + (sign * frictionForce);
-        return netForce;
+        return CalcEngineForce(coefficientOfFriction) + CalcFrictionForce(coefficientOfFriction);
     }
 
     Vector3 ResolveAccelerations(float coefficientOfFriction) {
         Vector3 resolvedAcceleration = new Vector3(0f, 0f, 0f);
 
         foreach (var key in Accelerations.Keys) {
-            resolvedAcceleration += Accelerations[key].calc(coefficientOfFriction);
+            resolvedAcceleration += Accelerations[key](coefficientOfFriction);
         }
 
         return resolvedAcceleration;
@@ -198,8 +232,11 @@ public class ArcadeVehicleMovement {
     Vector3 CalcAccelerationFromVehicle(float coefficientOfFriction) {
         if (!collision.IsGrounded) return Vector3.zero;
         if (!NoRollingFriction && (!input.IsBreaking && input.VerticalInput == 0f)) {
-            if (IsMovingForwards()) return VehicleDefaults.RollingDeceleration;
-            else if (IsMovingBackwards()) return -VehicleDefaults.RollingDeceleration;
+            Debug.Log(IsMovingForwards().ToString() + " | " + IsMovingBackwards().ToString());
+            if (IsMovingForwards())
+                return VehicleDefaults.RollingDeceleration;
+            else if (IsMovingBackwards())
+                return -VehicleDefaults.RollingDeceleration;
         } else {
             Vector3 netForce = CalcNetForce(coefficientOfFriction);
             Vector3 acceleration = KineticPhysics.Acceleration(netForce, vehicleSO.Mass);
@@ -215,20 +252,19 @@ public class ArcadeVehicleMovement {
         else return Vector3.zero;
     }
 
-    Vector3 CalcVelocity(float deltaTime, Vector3? velocity = null, Vector3? acceleration = null) {
-        velocity ??= this.velocity;
-        acceleration ??= this.acceleration;
-        Vector3 newVelocity = KineticPhysics.Velocity(velocity.Value, acceleration.Value, deltaTime);
-        newVelocity = newVelocity.RoundIfBasicallyZero();
+    Vector3 CalcVelocity(float deltaTime) {
+        Vector3 velocity = KineticPhysics.Velocity(this.velocity, acceleration, deltaTime);
+        velocity = velocity.RoundIfBasicallyZero();
         float maxSpeed = CalcMaxSpeed();
-        newVelocity = new Vector3(newVelocity.x, newVelocity.y, Mathf.Clamp(newVelocity.z, (float)-maxSpeed, (float)maxSpeed));
-        return newVelocity;
+        velocity = new Vector3(velocity.x, velocity.y, Mathf.Clamp(velocity.z, (float)-maxSpeed, (float)maxSpeed));
+        return velocity;
     }
 
-    float CalcSteeringValue() {
+    float CalcSteeringAngle() {
         if (!collision.IsGrounded) return 0f;
-        float steeringValue = input.SteeringMethod.Invoke(input.HorizontalInput);
-        return Mathf.Clamp(steeringValue * vehicleSO.SteeringModifier, -1f, 1f);
+        steeringValue = input.SteeringMethod.Invoke(input.HorizontalInput);
+        steeringValue = Mathf.Clamp(steeringValue * vehicleSO.SteeringModifier, -1f, 1f);
+        return steeringValue * Math.Abs(vehicleSO.SteeringAngle);
     }
 
     float CalcMaxSpeed() => NoMaxSpeed ? float.MaxValue : vehicleSO.MaxSpeed * MaxSpeedModifier;
@@ -246,18 +282,5 @@ public class ArcadeVehicleMovement {
         turnRadius *= (1f + velocity.Value.magnitude);
         turnRadius /= steeringValue.Value;
         return turnRadius;
-    }
-
-    class VectorCalc {
-        public string name;
-        /// <summary>If pure, is not affected by any modifiers</summary>
-        public Func<float, Vector3> calc;
-        /// <summary>If pure, is not affected by any modifiers</summary>
-        public float modifier = 1f;
-
-        public VectorCalc(string name, Func<float, Vector3> calc) {
-            this.name = name;
-            this.calc = calc;
-        }
     }
 }

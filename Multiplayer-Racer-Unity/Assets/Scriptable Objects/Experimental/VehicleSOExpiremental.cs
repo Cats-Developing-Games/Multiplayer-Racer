@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Vehicle", menuName = "Vehicles/Vehicle", order = 1)]
-public class VehicleSO : ScriptableObject
+//[CreateAssetMenu(fileName = "Vehicle", menuName = "Vehicles/Vehicle", order = 1)]
+public class VehicleSOExperimental : ScriptableObject
 {
     [Header("General")]
     /// <summary>Kilograms</summary>
@@ -13,6 +13,9 @@ public class VehicleSO : ScriptableObject
 
     [Header("Steering")]
     public float MinTurnRadius = VehicleDefaults.MinTurnRadius;
+    [Range(0f, 90f)][Description("Experimental. Doesnt do anything if the car is using circle based movement")]
+    /// <summary>Degrees</summary>
+    public float SteeringAngle = VehicleDefaults.SteeringAngle;
     public float SteeringModifier = VehicleDefaults.SteeringModifier;
 
     //[Header("Breaking")]

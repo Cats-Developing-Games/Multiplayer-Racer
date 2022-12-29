@@ -14,3 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _priority: 10
   _type: 0
+  TerrainEffect:
+    AccelerationModifier: 1
+    VelocityModifier: 1
+    CoefficientOfFriction: 1

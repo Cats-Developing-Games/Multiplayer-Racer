@@ -7,10 +7,10 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
-	"last_search.BDE7F5D3" = "t:material stone"
+	"last_search.BDE7F5D3" = "t:terrainso road"
 	"OpenInspectorPreview.BDE7F5D3" = "0"
 	"currentGroup.BDE7F5D3" = "all"
-	"last_search.982FBD6D" = "t:texture stone"
+	"last_search.982FBD6D" = "t:texture check"
 	"OpenInspectorPreview.982FBD6D" = "0"
 	"currentGroup.982FBD6D" = "all"
 }
@@ -59,6 +59,8 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"veh"
+	" "
 	"d"
 ]
 searchItemFavorites = [

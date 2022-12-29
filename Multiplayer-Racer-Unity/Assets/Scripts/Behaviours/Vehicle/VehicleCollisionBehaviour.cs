@@ -9,6 +9,7 @@ using UnityEngine.Events;
 public class VehicleCollisionBehaviour : MonoBehaviour
 {
     [SerializeField] new BoxCollider collider;
+    [Description("Automatically sets\nUse Gravity = False\nIs Kinematic = True")]
     [SerializeField] Rigidbody rb;
     [Header("Groud Checking")]
     [SerializeField] float groundCheckRayDistance = VehicleCollision.IS_GROUNDED_RAYCAST_DISTANCE;
@@ -39,6 +40,8 @@ public class VehicleCollisionBehaviour : MonoBehaviour
     {
         collider = GetComponent<BoxCollider>();
         if (rb is null) rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
+        rb.isKinematic = true;
     }
 
     void Update()
@@ -47,5 +50,9 @@ public class VehicleCollisionBehaviour : MonoBehaviour
             isGrounded = !isGrounded;
             OnGroundedChanged.Invoke(isGrounded);
         }
+    }
+
+    public void OnCollisionEnter(Collision collision) {
+        Debug.Log(collision);
     }
 }
