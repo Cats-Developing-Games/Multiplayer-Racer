@@ -50,27 +50,59 @@ public static class KineticPhysics {
 
     #endregion
 
+    #region Momentum
+
+    public static Vector3 Momentum(float mass, Vector3 velocity) {
+        return mass * velocity;
+    }
+
+    #endregion
+
+    #region Collision
+
+    /// <summary>
+    /// <b>Original Equation</b> - Conservation of momentum
+    /// <br/><br/>
+    /// p1_initial + p2_initial = p1_final + p2_final
+    /// <br/><br/>
+    /// <b>Derived Equation Used</b>
+    /// <br/><br/>
+    /// m1*v1_initial + m2*v2_initial = m1*(v2_final - (v2_initial - v1_initial)) + m2*v2_final
+    /// <br/><br/>
+    /// <b>Where</b>
+    /// <br/><br/>
+    /// p = momentum = m * v = mass * velocity
+    /// <br/><br/>
+    /// <see href="https://www.youtube.com/watch?v=okFcjFD5umU"/>
+    /// </summary>
+    //public static Vector3 ElasticCollisionVelocity(float mass1, Vector3 velocity1, float mass2, Vector3 velocity2) {
+    //    Vector3 p_initial = Momentum(mass1, velocity1) + Momentum(mass2, velocity2);
+    //    Vector3 p_final =
+    //    return Vector3.zero;
+    //}
+
+    #endregion
+
     #region Force
 
     /// <summary>Calculate the force of gravity</summary>
-    public static Vector3 ForceOfGravity(float mass, float angleOfIncline = 0f) {
-        return NormalForce(mass, GravitationalAcceleration, angleOfIncline);
+    public static Vector3 ForceOfGravity(float mass, float angleOfIncline = 0f, Vector3? gravitationalAcceleration = null) {
+        if (gravitationalAcceleration == null) gravitationalAcceleration = GravitationalAcceleration;
+        return Force(mass, (Vector3)gravitationalAcceleration) * Mathf.Cos(angleOfIncline);
     }
 
-    /// <summary>Calculate the force of gravity, assuming the object rests on an incline</summary>
-    public static Vector3 NormalForce(float mass, Vector3? normalAcceleration = null, float angleOfIncline = 0f) {
-        if (normalAcceleration == null) normalAcceleration = GravitationalAcceleration;
-        return Force(mass, (Vector3)normalAcceleration) * Mathf.Cos(angleOfIncline);
+    /// <summary>Calculate the normal force, assuming the object rests on an incline</summary>
+    public static Vector3 NormalForce(float mass, float angleOfIncline = 0f, Vector3? gravitationalAcceleration = null) {
+        return -ForceOfGravity(mass, angleOfIncline, gravitationalAcceleration ?? GravitationalAcceleration);
     }
 
     /// <summary>
-    /// Calculate the force of gravity, assuming the object rests on an incline and the normal plane is the XZ plane (1, 0, 1)
+    /// Calculate the normal force, assuming the object rests on an incline and the normal plane is the XZ plane (1, 0, 1)
     /// Uses the objects forward and right vectors (XZ plane) to calculate the angle of incline
     /// </summary>
-    public static Vector3 NormalForce(float mass, Transform transform, Vector3? normalAcceleration = null) {
-        if (normalAcceleration == null) normalAcceleration = GravitationalAcceleration;
-        float angleOfIncline = AngleOfIncline(-transform.up, GravitationalAcceleration);
-        return NormalForce(mass, normalAcceleration, angleOfIncline);
+    public static Vector3 NormalForce(float mass, Transform transform, Vector3? gravitationalAcceleration = null) {
+        float angleOfIncline = AngleOfIncline(-transform.up, gravitationalAcceleration ?? GravitationalAcceleration);
+        return NormalForce(mass, angleOfIncline, gravitationalAcceleration);
     }
 
     /// <summary>Get the absolute angle of incline relative to the direction of gravity (0, -1, 0)</summary>
@@ -79,36 +111,43 @@ public static class KineticPhysics {
     }
 
     /// <summary>Get the absolute angle of incline relative to the direction of worldUp</summary>
-    public static float AngleOfIncline(Vector3 up, Vector3 gravity) {
-        return Mathf.Abs(Vector3.Angle(up, gravity));
+    public static float AngleOfIncline(Vector3 up, Vector3 directionOfGravity) {
+        return Mathf.Abs(Vector3.Angle(up, directionOfGravity));
     }
 
     /// <summary>Calculate the force (with friction) against an object, assuming the normal force is gravity</summary>
-    public static Vector3 ForceOfFriction(float mass, float angleOfIncline = 0f, float frictionCoefficient = 0f) {
-        return frictionCoefficient * ForceOfGravity(mass, angleOfIncline);
+    public static Vector3 ForceOfFriction(Vector3 directionOfAppliedForce, float mass, float angleOfIncline = 0f, float frictionCoefficient = 0f) {
+        Vector3 normalForce = NormalForce(mass, angleOfIncline);
+        return ForceOfFriction2(directionOfAppliedForce, normalForce, frictionCoefficient);
     }
 
     /// <summary>Calculate the force (with friction) against an object, assuming the normal force is gravity</summary>
-    public static Vector3 ForceOfFriction(float mass, Transform transform, float frictionCoefficient = 0f) {
-        float angleOfIncline = AngleOfIncline(transform.up);
-        //Debug.Log("Angle of Incline: " + angleOfIncline.ToString());
-        return frictionCoefficient * ForceOfGravity(mass, angleOfIncline);
+    public static Vector3 ForceOfFriction(Vector3 directionOfAppliedForce, float mass, Transform transform, float frictionCoefficient = 0f) {
+        return ForceOfFriction(directionOfAppliedForce, mass, AngleOfIncline(transform.up), frictionCoefficient);
     }
 
     /// <summary>Calculate the force (with friction) against an object, assuming the normal force is <b>NOT</b> gravity</summary>
-    public static Vector3 ForceOfFriction2(Vector3 normalForce, float frictionCoefficient = 0f) {
-        return frictionCoefficient * normalForce;
+    public static Vector3 ForceOfFriction2(Vector3 directionOfAppliedForce, Vector3 normalForce, float frictionCoefficient = 0f) {
+        normalForce = frictionCoefficient * normalForce;
+        Vector3 frictionForce;
+        if (directionOfAppliedForce.magnitude == 0f) {
+            frictionForce = Vector3.zero;
+        } else {
+            frictionForce = Vector3.RotateTowards(normalForce, -directionOfAppliedForce, 2 * Mathf.PI, 0f);
+        }
+        return frictionForce;
     }
 
     /// <summary>Calculate force with friction on an incline assuming the force of gravity is coming from (0, -1, 0)</summary>
-    public static Vector3 Force(float mass, Vector3 acceleration, Transform transform, float frictionCoefficient = 0f) {
+    public static Vector3 Force(Vector3 directionOfAppliedForce, float mass, Vector3 acceleration, Transform transform, float frictionCoefficient = 0f) {
         float angleOfIncline = AngleOfIncline(transform.up);
-        return Force(mass, acceleration) - ForceOfFriction(mass, angleOfIncline, frictionCoefficient);
+        return Force(mass, acceleration) - ForceOfFriction(directionOfAppliedForce, mass, angleOfIncline, frictionCoefficient);
     }
 
     /// <summary>Calculate force with friction</summary>
-    public static Vector3 Force(float mass, Vector3 acceleration, float frictionCoefficient = 0f, float angleOfIncline = 0f) {
-        return Force(mass, acceleration) - ForceOfFriction(mass, angleOfIncline, frictionCoefficient);
+    public static Vector3 Force(Vector3 directionOfAppliedForce, float mass, Vector3 acceleration, float frictionCoefficient = 0f, float angleOfIncline = 0f) {
+        return Force(mass, acceleration) - ForceOfFriction(directionOfAppliedForce, mass, angleOfIncline, frictionCoefficient);
+
     }
 
     /// <summary>Calculate force based on Newtons formula F=ma</summary>

@@ -15,29 +15,27 @@ public class VehicleSO : ScriptableObject
     public float Mass = VehicleDefaults.Mass;
 
     [Header("Engine")]
-    public Vector3 EngineForce = new Vector3(0f, 0f, VehicleDefaults.EngineForce);
-
-    [DisplayStat(3, 5f, 20f, StatName = "Engine Power")]
-    private float GetEngineForceFloat() => EngineForce.z;
+    [DisplayStat(3, 2000f, 6000f, StatName = "Engine Power")]
+    public float EngineForce = VehicleDefaults.EngineForce;
 
 
     [DisplayStat(2, 2f, 30f, StatName = "Max Speed")]
     public float MaxSpeed = VehicleDefaults.MaxSpeed;
 
     public Vector3 GetAcceleration() => KineticPhysics.Acceleration(EngineForce, Mass);
-
     
-
     [Header("Steering")]
     public float MinTurnRadius = VehicleDefaults.MinTurnRadius;
-    public float SteeringModifier = VehicleDefaults.SteeringModifier;
+    [Range(0f, 90f)]
+    /// <summary>Degrees</summary>
+    public float SteeringAngle = VehicleDefaults.SteeringAngle;
 
     //[Header("Breaking")]
     //public static readonly float DefaultBreakDeceleration = 10f;
     //public float BreakDeceleration = DefaultBreakDeceleration;
 
     [Header("Traction")]
-    [Description("Traction is multiplied to the cars coefficient of friction")]
+    [Description("(Experimental) Traction is multiplied to the cars coefficient of friction")]
     // TODO: applying traction this way does not feel right, but I am not sure how it should be done
     // Also see ArcadePlayerController.calcFrictionCoefficient
     public float WheelTraction = VehicleDefaults.Traction;
@@ -45,21 +43,21 @@ public class VehicleSO : ScriptableObject
 
 struct VehicleDefaults {
     public static readonly Vector3 RollingDeceleration = new Vector3(0f, 0f, -1f);
-    // Unity's old input systems GetAxis increased/decreased 0.05 per step. Assuming it was ran in FixedUpdate (50/sec), thats 0->1 in 2.5 seconds
-    public const float KeyboardTimeToMaxTurn = 2.5f;
 
     // General
     /// <summary>Kilograms</summary>
     public const float Mass = 1360f;
 
     // Engine
-    public const float EngineForce = 10f;
+    /// <summary>Assumed to be applied in the Z direction</summary>
+    public const float EngineForce = 3000f;
     public const float MaxSpeed = 10f;
     public const float Acceleration = 10f;
 
     // Steering
     public const float MinTurnRadius = 1f;
-    public const float SteeringModifier = 1f;
+    /// <summary>Degrees</summary>
+    public const float SteeringAngle = 65f;
 
     // Traction
     public const float Traction = 1f;
