@@ -8,6 +8,8 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 public class PlayerVehiclePicker : NetworkBehaviour
 {
@@ -49,7 +51,11 @@ public class PlayerVehiclePicker : NetworkBehaviour
     }
 
     #region Ready Up UI
-    public void ShowStartGameButton() => startGameButton.gameObject.SetActive(true);
+    public void ShowStartGameButton(UnityAction onStartGame)
+    {
+        startGameButton.onClick.AddListener(onStartGame);
+        startGameButton.gameObject.SetActive(true);
+    }
 
     public void SetStartGameInteractable(bool interactable) => startGameButton.interactable = interactable;
 
@@ -58,7 +64,7 @@ public class PlayerVehiclePicker : NetworkBehaviour
         readyUpButtonText.SetText(setIsReady ? "Unready" : "Ready Up");
 
         // Making it so prev and next button are disabled
-        foreach(var btn in lockWhenReadiedUp) btn.interactable = !setIsReady;
+        foreach (var btn in lockWhenReadiedUp) btn.interactable = !setIsReady;
     }
     #endregion
 
@@ -119,7 +125,7 @@ public class PlayerVehiclePicker : NetworkBehaviour
     private void SetSelectedVehicleIndexServerRpc(int index)
     {
         // Can't change selected vehicle index when player is ready
-        if(PlayerReady.Value) return;  
+        if (PlayerReady.Value) return;
 
         var total = vehicles.Count;
         var clampedIndex = (index + total) % total;
@@ -129,6 +135,8 @@ public class PlayerVehiclePicker : NetworkBehaviour
 
     [ServerRpc] private void SelectNextVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value + 1);
     [ServerRpc] private void SelectPreviousVehicleServerRpc() => SetSelectedVehicleIndexServerRpc(selectedVehicleIndex.Value - 1);
+
+    public VehicleSO GetSelectedVehicle() => vehicles[selectedVehicleIndex.Value];
 
     #endregion
 }

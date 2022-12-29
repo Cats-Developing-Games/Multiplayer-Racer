@@ -961,6 +961,7 @@ MonoBehaviour:
   hostBtn: {fileID: 25503380}
   clientIPInputField: {fileID: 2099814801}
   clientBtn: {fileID: 541929727}
+  localMode: 1
 --- !u!1 &1360366985
 GameObject:
   m_ObjectHideFlags: 0
@@ -1243,12 +1244,12 @@ MonoBehaviour:
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 6756066438253991011, guid: 225d8f20684fa304bbe9a6783758ea3f, type: 3}
+      Prefab: {fileID: 3937356664428366377, guid: 9b13673af3fdc37428cf57b353bf3dd1, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 6756066438253991011, guid: 2ff1c5f0df3ecf042a083253be67bac4, type: 3}
+      Prefab: {fileID: 7716892049885729620, guid: 48fae9d01d1232a4d9253f6da65cd1a5, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}

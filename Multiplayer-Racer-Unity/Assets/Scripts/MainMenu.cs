@@ -17,7 +17,9 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Button clientBtn;
 
     private string publicIPAddress = null;
-    private bool useLoopback = true;
+
+    [SerializeField]
+    private bool localMode = true;
 
     void Awake()
     {
@@ -25,15 +27,15 @@ public class MainMenu : MonoBehaviour
 
         hostBtn.onClick.AddListener(() =>
         {
-            if (publicIPAddress == null) {
+            if (publicIPAddress == null && localMode == false) {
                 Debug.Log("The public IP Address has not been loaded yet");
                 return;
             }
 
             var localIP = GetLocalIPv4();
             var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-            transport.ConnectionData.Address = useLoopback ? "127.0.0.1" : publicIPAddress;
-            transport.ConnectionData.ServerListenAddress = useLoopback ? "127.0.0.1" : localIP;
+            transport.ConnectionData.Address = localMode ? "127.0.0.1" : publicIPAddress;
+            transport.ConnectionData.ServerListenAddress = localMode ? "127.0.0.1" : localIP;
 
             NetworkManager.Singleton.StartHost();
             Debug.Log("Hosting Server on: " + transport.ConnectionData.ServerEndPoint);
@@ -43,7 +45,7 @@ public class MainMenu : MonoBehaviour
 
         clientBtn.onClick.AddListener(() =>
         {
-            NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = useLoopback ? "127.0.0.1" : clientIPInputField.text;
+            NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = localMode ? "127.0.0.1" : clientIPInputField.text;
 
             Debug.Log("Connecting to " + NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.ServerEndPoint);
             NetworkManager.Singleton.StartClient();

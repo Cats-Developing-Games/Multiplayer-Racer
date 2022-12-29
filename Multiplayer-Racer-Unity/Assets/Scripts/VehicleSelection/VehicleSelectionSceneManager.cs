@@ -26,10 +26,22 @@ public class VehicleSelectionSceneManager : NetworkBehaviour
         var nm = NetworkManager.Singleton;
         s_multicamGrid = GetComponent<MulticamGrid>();
         InitializePlayerVehiclePickers(nm.ConnectedClientsIds);
-        GetOwnerPlayerPicker().ShowStartGameButton();
+
+        var ownerPlayer = GetOwnerPlayerPicker();
+        ownerPlayer.ShowStartGameButton(StartGame);
 
         nm.OnClientConnectedCallback += InitializeNewClient;
         nm.OnClientDisconnectCallback += RemoveClient;
+    }
+
+    private void StartGame()
+    {
+        var clientIdToSelectedVehicle = new Dictionary<ulong, VehicleSO>();
+        foreach(var (clientId, picker) in s_players) {
+            clientIdToSelectedVehicle.Add(clientId, picker.GetSelectedVehicle());
+        }
+        //TODO: Jaren Start here!
+        NetworkManager.Singleton.SceneManager.LoadScene("Level 1", UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
 
     private PlayerVehiclePicker GetOwnerPlayerPicker() => s_players[NetworkManager.Singleton.LocalClientId];

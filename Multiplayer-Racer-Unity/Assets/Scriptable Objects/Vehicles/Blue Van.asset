@@ -9,15 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0159d568f4d83ea419a56575449b1cf5, type: 3}
+  m_Script: {fileID: 11500000, guid: 4fa1ba080eea2a149b273a71f1316663, type: 3}
   m_Name: Blue Van
   m_EditorClassIdentifier: 
   VehicleName: Blue Van
-  InGamePrefab: {fileID: 6756066438253991011, guid: 225d8f20684fa304bbe9a6783758ea3f, type: 3}
+  InGamePrefab: {fileID: 3937356664428366377, guid: 9b13673af3fdc37428cf57b353bf3dd1, type: 3}
   PreviewPrefab: {fileID: 5085056515243831620, guid: a12c34df3854b584c8ae91a88b22dc48, type: 3}
-  Mass: 1200
+  Mass: 1360
   EngineForce: 3000
   MaxSpeed: 10
-  MinTurnRadius: 0.7
-  SteeringAngle: 65
+  MinTurnRadius: 1
+  SteeringModifier: 1
   WheelTraction: 1
