@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,24 @@ public class TerrainSO : ScriptableObject
 
     [SerializeField, InspectorName("Terrain Type")]
     private TerrainType _type = TerrainType.None;
-    public TerrainType Type => _type; 
+    public TerrainType Type => _type;
+
+    public TerrainEffect TerrainEffect;
+}
+
+[Serializable]
+public class TerrainEffect {
+    [Range(0.1f, 2f)]
+    public float AccelerationModifier = 1f;
+    [Range(0.1f, 2f)]
+    public float VelocityModifier = 1f;
+    [Range(0.1f, 2f)]
+    [Tooltip("Affects Breaking")]
+    public float CoefficientOfFriction = 1f;
+}
+
+public class TerrainEffectAccelerationModifier : TerrainEffect {
+    float modifier = 1f;
 }
 
 /// <summary>

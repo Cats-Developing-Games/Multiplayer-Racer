@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(BoxCollider))]
 public class CheckpointController : NetworkBehaviour
 {
+    [Description("Procedurally filled. Do not add manually")]
     [SerializeField] GameObject[] checkpoints;
     GameObject startEndCheckpoint;
     GameObject lastCheckpoint;
@@ -21,13 +24,14 @@ public class CheckpointController : NetworkBehaviour
 
     HashSet<string> checkpointTags = new HashSet<string>() { START_END_TAG, CHECKPOINT_TAG, LAST_CHECKPOINT_TAG };
 
-    public override void OnNetworkSpawn() {
+    public void OnLevelStart(ulong clientId, string sceneName, LoadSceneMode loadSceneMode) {
         startEndCheckpoint = GameObject.FindGameObjectWithTag(START_END_TAG);
         List<GameObject> checkpoints = GameObject.FindGameObjectsWithTag(CHECKPOINT_TAG).ToList();
         lastCheckpoint = GameObject.FindGameObjectWithTag(LAST_CHECKPOINT_TAG);
-        checkpoints.Insert(0, startEndCheckpoint);
-        checkpoints.Add(lastCheckpoint);
+        if (startEndCheckpoint is not null) checkpoints.Insert(0, startEndCheckpoint);
+        if (lastCheckpoint is not null) checkpoints.Add(lastCheckpoint);
         this.checkpoints = checkpoints.ToArray();
+        if (this.checkpoints.Length == 0) Debug.LogError("No checkpoints found in scene " + sceneName);
     }
 
     private void OnTriggerEnter(Collider other)

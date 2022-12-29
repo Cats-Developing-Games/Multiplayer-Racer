@@ -170,8 +170,7 @@ public class VehicleMovementRigidbody {
 
     /// <returns>A value from -1 to 1</returns>
     public float CalcSteeringValue() {
-        float steering = input.SteeringMethod.Invoke(input.HorizontalInput);
-        return steering * vehicleSO.SteeringAngle;
+        return input.SteeringMethod.Invoke(input.HorizontalInput) * vehicleSO.SteeringModifier;
     }
 
     float CalcMaxSpeed() => NoMaxSpeed ? float.MaxValue : vehicleSO.MaxSpeed * MaxSpeedModifier;

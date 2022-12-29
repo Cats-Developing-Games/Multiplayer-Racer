@@ -3,7 +3,7 @@ using PathCreation.Utility;
 using UnityEngine;
 
 namespace PathCreation.Examples {
-    public class WallMeshCreator : PathSceneTool {
+    public class PathMeshCreator : PathSceneTool {
         [Header("Road settings")]
         public string MeshObjectName = "Mesh Holder";
         public float roadWidth = .4f;

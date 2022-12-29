@@ -10,16 +10,13 @@ using System.Collections.Generic;
 [RequireComponent(typeof(PlayerInput))]
 public class ArcadeCarController : NetworkBehaviour
 {
-    // TODO: change vehicle accel, velocity, and force calculations to be Vector3. not floats
+    #region Vars
 
     [Header("Vehicle")]
     [Foldout][SerializeField] VehicleSO vehicleSO;
     [SerializeField] Transform transformToMove;
     [SerializeField] VehicleCollisionBehaviour collision;
-    [Description("If the VehicleCollisionBehaviour's Rigidbodies gravity is flagged, this will automatically be disabled")]
-    [SerializeField] bool useGravity = false;
-    [Description("Experimental")]
-    [SerializeField] bool DontUseCircleBasedMovement = false;
+    [SerializeField] CheckpointController checkpointHandler;
 
     [Header("Environment")]
     // temporary. should be passed from outside this class
@@ -34,7 +31,8 @@ public class ArcadeCarController : NetworkBehaviour
     [Header("Gizmos")]
     public bool DrawDrivingDirection = false;
     public bool DrawMininumTurnRadius = false;
-    public bool DrawDriveableIcon = false;
+    public bool LogTerrainChange = false;
+    //public bool DrawDriveableIcon = false;
 
     [Header("Cheats")]
     public bool NoRollingFriction;
@@ -44,10 +42,13 @@ public class ArcadeCarController : NetworkBehaviour
     VehicleInputHandler input;
     ArcadeVehicleMovement movement;
 
+    #endregion
+
     public override void OnNetworkSpawn() {
         if (!IsOwner) return;
         //if (spawn != null) UpdatePositionServerRpc(OwnerClientId, spawn.transform.position);
         NetworkManager.Singleton.SceneManager.OnLoadComplete += MoveToSpawn;
+        NetworkManager.Singleton.SceneManager.OnLoadComplete += checkpointHandler.OnLevelStart;
         if (follow || lookAt) {
             GameObject cameraObject = null;
             if (camera is null) cameraObject = GameObject.Find("Cinemachine");
@@ -62,26 +63,11 @@ public class ArcadeCarController : NetworkBehaviour
         input = GetComponent<VehicleInputHandler>();
         if (transformToMove == null) Debug.LogError("No Transform was specified in " + gameObject.name);
         if (collision == null) Debug.LogError("No VehicleCollisionBehaviour was attached to " + gameObject.name);
-        else {
-            if (collision.Rigidbody.useGravity) useGravity = false;
-        }
         movement = new ArcadeVehicleMovement(vehicleSO, input, transformToMove, collision);
-        movement.GravityEnabled = useGravity;
-        movement.OnlyVelocityBasedMovement = DontUseCircleBasedMovement;
         movement.NoRollingFriction = NoRollingFriction;
         movement.NoMaxSpeed = NoMaxSpeed;
     }
-
-    public void MoveToSpawn(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode sceneMode) {
-        var spawn = GameObject.Find("Spawn");
-        if (spawn is null) {
-            Debug.LogError("No GameObject named 'Spawn' found");
-            return;
-        }
-        transformToMove.position = spawn.transform.position;
-        transformToMove.rotation = spawn.transform.rotation;
-    }
-
+    
     void Update() {
         if (!IsOwner) return;
         if (movement is null) return;
@@ -91,10 +77,10 @@ public class ArcadeCarController : NetworkBehaviour
 
     void OnDrawGizmos() {
         if (movement != null) {
-            if (DrawDriveableIcon) {
-                if (collision.IsGrounded) Gizmos.DrawIcon(transform.position + (1f * transform.up), "steering-wheel.png", true, Color.green);
-                else Gizmos.DrawIcon(transform.position + (1f * transform.up), "steering-wheel.png", true, Color.red);
-            }
+            //if (DrawDriveableIcon) {
+            //    if (collision.IsGrounded) Gizmos.DrawIcon(transform.position + (1f * transform.up), "steering-wheel.png", true, Color.green);
+            //    else Gizmos.DrawIcon(transform.position + (1f * transform.up), "steering-wheel.png", true, Color.red);
+            //}
             if (DrawDrivingDirection) {
                 if (movement.IsTurning()) {
                     Gizmos.color = Color.gray;
@@ -116,11 +102,19 @@ public class ArcadeCarController : NetworkBehaviour
         // no wheels fr fr. no cap
     }
 
-    public void OnCollisionEnter(Collision collision) {
-        Debug.Log(collision);
+    public void MoveToSpawn(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode sceneMode) {
+        var spawn = GameObject.Find("Spawn");
+        if (spawn is null) {
+            Debug.LogError("No GameObject named 'Spawn' found");
+            return;
+        }
+        transformToMove.position = spawn.transform.position;
+        transformToMove.rotation = spawn.transform.rotation;
     }
 
     public void HandleTerrainChange(TerrainSO newTerrain) {
-        Debug.Log(newTerrain);
+        if (LogTerrainChange) Debug.Log(newTerrain);
+        movement.VelocityModifier = newTerrain.TerrainEffect.VelocityModifier;
+        //RoadFrictionCoefficient = newTerrain.TerrainEffect;
     }
 }

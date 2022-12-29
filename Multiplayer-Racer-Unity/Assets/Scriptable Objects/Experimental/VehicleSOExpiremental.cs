@@ -1,31 +1,21 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Vehicle", menuName = "Vehicles/Vehicle", order = 1)]
-public class VehicleSO : ScriptableObject
+//[CreateAssetMenu(fileName = "Vehicle", menuName = "Vehicles/Vehicle", order = 1)]
+public class VehicleSOExperimental : ScriptableObject
 {
-    [Header("Vehicle Selection")]
-    public string VehicleName = "";
-    public GameObject InGamePrefab;
-    public GameObject PreviewPrefab;
-    
-
     [Header("General")]
-    [DisplayStat(1, 300, 3000)]
     /// <summary>Kilograms</summary>
     public float Mass = VehicleDefaults.Mass;
 
     [Header("Engine")]
-    [DisplayStat(3, 2000f, 6000f, StatName = "Engine Power")]
     public float EngineForce = VehicleDefaults.EngineForce;
-
-    [DisplayStat(2, 2f, 30f, StatName = "Max Speed")]
     public float MaxSpeed = VehicleDefaults.MaxSpeed;
-    
-    [DisplayStat(4, -2f, -.5f)]
-    private float Handling => -MinTurnRadius;
 
     [Header("Steering")]
     public float MinTurnRadius = VehicleDefaults.MinTurnRadius;
+    [Range(0f, 90f)][Description("Experimental. Doesnt do anything if the car is using circle based movement")]
+    /// <summary>Degrees</summary>
+    public float SteeringAngle = VehicleDefaults.SteeringAngle;
     public float SteeringModifier = VehicleDefaults.SteeringModifier;
 
     //[Header("Breaking")]
