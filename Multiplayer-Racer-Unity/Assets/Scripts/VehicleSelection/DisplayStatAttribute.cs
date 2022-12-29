@@ -7,8 +7,6 @@ public class DisplayStatAttribute : Attribute
     public float MaxValue { get; }
     public float MinValue { get; }
 
-    public Func<object, float> GetNonFloatValue { get; set; } = null;
-
     public string StatName { get; set; }
 
     public DisplayStatAttribute(int order, float minValue, float maxValue)

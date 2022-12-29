@@ -18,12 +18,12 @@ public class VehicleSO : ScriptableObject
     [DisplayStat(3, 2000f, 6000f, StatName = "Engine Power")]
     public float EngineForce = VehicleDefaults.EngineForce;
 
-
     [DisplayStat(2, 2f, 30f, StatName = "Max Speed")]
     public float MaxSpeed = VehicleDefaults.MaxSpeed;
-
-    public Vector3 GetAcceleration() => KineticPhysics.Acceleration(EngineForce, Mass);
     
+    [DisplayStat(4, -2f, -.5f)]
+    private float Handling => -MinTurnRadius;
+
     [Header("Steering")]
     public float MinTurnRadius = VehicleDefaults.MinTurnRadius;
     [Range(0f, 90f)]

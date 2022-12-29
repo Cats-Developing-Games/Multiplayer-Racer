@@ -16,8 +16,8 @@ MonoBehaviour:
   InGamePrefab: {fileID: 6756066438253991011, guid: 225d8f20684fa304bbe9a6783758ea3f, type: 3}
   PreviewPrefab: {fileID: 5085056515243831620, guid: a12c34df3854b584c8ae91a88b22dc48, type: 3}
   Mass: 1200
-  EngineForce: {x: 0, y: 0, z: 10}
+  EngineForce: 3000
   MaxSpeed: 10
-  MinTurnRadius: 1
-  SteeringModifier: 1
+  MinTurnRadius: 0.7
+  SteeringAngle: 65
   WheelTraction: 1
